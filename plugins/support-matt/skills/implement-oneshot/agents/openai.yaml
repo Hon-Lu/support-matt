@@ -1,5 +1,0 @@
-interface:
-  display_name: "Implement Oneshot"
-  short_description: "一次做完一張小票，code-review 改為詢問"
-policy:
-  allow_implicit_invocation: false

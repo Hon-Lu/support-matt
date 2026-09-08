@@ -57,7 +57,7 @@ Matt 的 `code-review` 的**上層入口**。它自己不取代任何審查能�
 
 本 skill **完整調用** `mattpocock-skills:code-review`，把上面判定出來的固定點與規格來源交給它，兩軸照原樣跑完。
 
-**不對它套用任何瘦身參數。** 本 skill 是合併前的最後一關，`implement-oneshot` 那套「Spec 軸改讀 ticket、縮小固定點」的省法在那裡成立（實作剛做完、驗收條件剛逐條核對過），在這裡不成立——這裡要看的正是整條 branch 累積下來、逐票核對看不到的東西。省 token 的位置不在這一關。
+**不對它套用任何瘦身參數。** 本 skill 是合併前的最後一關，單張 ticket 收尾那套「Spec 軸改讀 ticket、縮小固定點」的省法在那裡成立（實作剛做完、驗收條件剛逐條核對過），在這裡不成立——這裡要看的正是整條 branch 累積下來、逐票核對看不到的東西。省 token 的位置不在這一關。
 
 ### Matt 的兩軸報告是輸入，不是輸出
 
@@ -202,7 +202,7 @@ findings 依 `P0` 至 `P3` 排序，使用以下格式：
 ## 在流程中的位置
 
 ```text
-implement-stepwise / implement-oneshot 完成
+implement-stepwise 完成
     → [to-code-review]（本 skill，合併前最後一關）
     → to-engineering-spec 定稿 → to-acceptance-map → engineering-spec-deliverable
 
@@ -211,6 +211,6 @@ implement-stepwise / implement-oneshot 完成
 
 ## 下一步引導（純提示，不主動調用）
 
-- **有 P0 / P1** → 提示先處理再合併；修正屬於實作，回 `implement-stepwise` 或 `implement-oneshot` 處理，本 skill 不動程式。
+- **有 P0 / P1** → 提示先處理再合併；修正屬於實作，回 `implement-stepwise` 處理，本 skill 不動程式。
 - **只有 P2 / P3** → 提示由使用者決定本次處理或另開 ticket。
 - **修正後** → 提示重跑本 skill，`REVIEW.md` 會覆寫成當下狀態。

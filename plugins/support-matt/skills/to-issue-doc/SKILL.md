@@ -21,7 +21,7 @@ description: 維護單一份要貼上公司主 GitLab Issue 的規格文件 issu
 ## 工作流位置
 
 ```text
-grill-with-docs → to-spec → [to-issue-doc brief] → to-tickets → implement(-oneshot/-stepwise)
+grill-with-docs → to-spec → [to-issue-doc brief] → to-tickets → implement-stepwise
                                     ↑                                          ↓
                     [to-issue-doc 修訂] ← to-change-request           全部 ticket 完成
                                                                                ↓

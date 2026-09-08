@@ -1,7 +1,7 @@
 # support-matt
 
-套件版本：`v0.17.9`
-更新時間：2026-08-28
+套件版本：`v0.19.0`
+更新時間：2026-09-08
 安裝教程：[INSTALL.md](./INSTALL.md)
 <!-- 版本對齊 plugins/support-matt/.claude-plugin/plugin.json 與 .codex-plugin/plugin.json，發版時三處版本與此處日期一併更新 -->
 
@@ -24,8 +24,7 @@
 | `to-issue-doc` | 貼上主 Issue 的 `issue-doc.md`，**分兩個時點寫**：拆票前的 brief 只寫「約束」——目標與範圍、方案輪廓、關鍵決策、驗證條件 `VC-xx`、風險（不先定版，這些決策會發生在拆票裡而沒有紀錄），只有 VC 那張表要逐條確認；系統分析、資料模型、介面與流程屬於「紀錄」，留到 branch 做完跑 `final`，由既成事實（程式碼、ticket 核對表、`git diff`）補齊。開發中途就地修訂。 |
 | `to-engineering-spec` | 同一種文件，但**動工前一次寫到位**：系統分析、技術設計、實作約束都在拆票前定版、經審查後才動手。差別不在誰的規則比較嚴，而在設計要不要先成為「被遵守的約束」——動角色權限、動 schema 牽動交易邊界、改變既有架構假設，或公司要求動工前提交完整設計時，事後補寫就來不及了。 |
 | `engineering-spec-deliverable` | 把工作版 `engineering-spec.md` 轉成可獨立閱讀、可直接貼上公司 GitLab Issue 的交付版。 |
-| `implement-oneshot` | 取代 `implement`（**一路做完**）：單一 session 做完整張票，形狀貼近原生，但開場先評估規模、收尾（測試 + 逐條核對驗收條件 + 寫回 ticket）做完即結束，**不跑也不引導 `code-review`**。 |
-| `implement-stepwise` | `implement-oneshot` 的變體（**即時插手**）：核心完全相同，只差每個 commit 送出前停下，附完整 commit message 與變更清單等你過目；回「繼續」才提交並接著做下一個 commit；沒有更多 commit 時，收尾開始前再停一次預告。不預先產 commit checklist。 |
+| `implement-stepwise` | 取代 `implement`（**即時插手**）：單一 session 做完整張票，形狀貼近原生，但開場先評估規模、每個 commit 送出前停下附完整 commit message 與變更清單等你過目，回「繼續」才提交並接著做下一個；沒有更多 commit 時收尾開始前再停一次預告；收尾（測試 + 逐條核對驗收條件 + 寫回 ticket）做完即結束，**不跑也不引導 `code-review`**。不預先產 commit checklist。 |
 | `to-acceptance-map` | branch 開發完畢後於**獨立 session** 盤點測試覆蓋，產出 `acceptance-map.md`。驗證基準只認規格文件的 `VC-xx`，不拿 ticket 充數。四級判定區分「需補測試」與「不適用測試」，另檢出可能已失效的測試與潛在重複覆蓋（只偵測、不動測試）。回報只呈現例外，全程唯讀。 |
 | `to-change-request` | 開發中途改動的**再入點**：grill 完接這一支，一次做完 `spec.md` delta、規格文件修訂（委派給該 feature 實際用的 `to-issue-doc` 或 `to-engineering-spec`）與追加 ticket，一個確認關卡。純實作的改動直接請你去 implement，不動文件。 |
 | `to-code-review` | Matt `code-review` 的**上層入口**：自家 branch 只需給目標分支，規格由 feature 目錄自動取得、`REVIEW.md` 寫回該目錄；代審他人 MR 則另外要背景說明，寫到 `.ai/code-review/`。兩軸結果一律過證據門檻後才輸出 P0–P3 findings。 |
@@ -40,7 +39,7 @@ grill-with-docs → to-spec ─┬─ 設計後補　 → [to-issue-doc brief] �
                            └─ 設計先定版 → [to-engineering-spec] → 人工確認 ────┘
                                           └─ [engineering-spec-deliverable] 隨時可跑
                                                                           ↓
-        單張 ticket 一次做完 → [implement-oneshot]  /  每個 commit 送出前停 → [implement-stepwise]
+                          單張 ticket，每個 commit 送出前停 → [implement-stepwise]
                                                                           ↓
                                                               整條 branch 的 ticket 全部完成（以下開新 session）
                                                                           ↓
@@ -49,19 +48,14 @@ grill-with-docs → to-spec ─┬─ 設計後補　 → [to-issue-doc brief] �
                                                                           ↓
                                                               [to-code-review]（發 MR 前最後一關，自行 Code Review 驗證）
 
-開發中途要改：grill-me / grill-with-docs → [to-change-request] → implement (oneshot / stepwise)
+開發中途要改：grill-me / grill-with-docs → [to-change-request] → implement-stepwise
               （文件同步由 to-change-request 委派給這個 feature 實際用的那一份：to-issue-doc 或 to-engineering-spec 的修訂模式）
 代審他人 MR：[to-code-review]（模式 B），與上面的 pipeline 無關
 ```
 
-兩個 implement 取代 Matt 的 `implement`，內部都調用其 `tdd`，開場都會先評估 ticket 規模、過重時建議你回 `to-tickets` 拆小，收尾做完就結束——**兩支都不跑也不引導 `code-review`**，審查統一留到整條 branch 完成後的 `to-code-review`。差別只有一個——你想不想在 commit 送出前插手：
+`implement-stepwise` 取代 Matt 的 `implement`，內部調用其 `tdd`，開場先評估 ticket 規模、過重時建議你回 `to-tickets` 拆小，每個 commit 送出前停下讓你過目（附完整 commit message），收尾做完就結束——**不跑也不引導 `code-review`**，審查統一留到整條 branch 完成後的 `to-code-review`。不想在 commit 送出前插手時，直接用 Matt 原生的 `implement` 即可，本 plugin 不另外提供不停的版本。
 
-| | commit 送出前停 | 事前產出 commit 規劃 | 適用 |
-| --- | --- | --- | --- |
-| `implement-oneshot` | 否 | 否 | 邊界清楚、放手做完就好 |
-| `implement-stepwise` | **是**（附完整 commit message） | 否 | 想看一眼每次要進 repo 的東西 |
-
-實作規範由兩份共用 reference 提供（`plugins/support-matt/references/`），兩個 skill 都讀同一份，避免分岔：
+實作規範由兩份 reference 提供（`plugins/support-matt/references/`）：
 
 | Reference | 內容 |
 | --- | --- |

@@ -27,7 +27,7 @@ description: 整條 branch 開發完畢、規格文件收斂完成後（`issue-d
 
 ## 為什麼要獨立執行
 
-`implement-stepwise` / `implement-oneshot` 在每個 commit 完成時會記錄「本次寫了哪些測試、涵蓋哪幾條驗收條件」。**那份記錄是實作者的自我聲明，不是證據。**
+`implement-stepwise` 在每個 commit 完成時會記錄「本次寫了哪些測試、涵蓋哪幾條驗收條件」。**那份記錄是實作者的自我聲明，不是證據。**
 
 本 skill 的價值來自獨立性：在**乾淨的新 session** 執行，不帶開發過程的 context，逐項自行確認測試確實存在、且真的涵蓋該項目。
 
@@ -40,7 +40,7 @@ description: 整條 branch 開發完畢、規格文件收斂完成後（`issue-d
 - **只建立或覆寫 `acceptance-map.md` 一個檔案。**
 - 對 ticket 檔案、規格文件、`spec.md`、功能程式碼、測試程式**一律唯讀**。
 - **不補寫任何測試、不修改任何程式碼、不修改設計文件、不勾選任何 checklist。**
-- **不刪除、不合併、不改寫任何測試**——包含步驟 4.1 列為可能已失效、以及步驟 4.2 列為潛在重複的那些。動不動由使用者決定，實際修改回到 `implement-stepwise` / `implement-oneshot`。本 skill 是獨立稽核者，一旦自己動手改測試，它報出來的結果就不再是獨立判定。
+- **不刪除、不合併、不改寫任何測試**——包含步驟 4.1 列為可能已失效、以及步驟 4.2 列為潛在重複的那些。動不動由使用者決定，實際修改回到 `implement-stepwise`。本 skill 是獨立稽核者，一旦自己動手改測試，它報出來的結果就不再是獨立判定。
 - 發現缺漏時只回報，由使用者決定後續處理。
 - **唯讀指的是不修改檔案，不是不執行。** 本 skill 會執行測試（步驟 3），那是判定的必要依據；範圍由使用者選擇。
 
@@ -275,7 +275,7 @@ description: 整條 branch 開發完畢、規格文件收斂完成後（`issue-d
 
 ## 潛在重複覆蓋（請確認，本 skill 不動測試）
 
-> 以下測試目前都有效，只是看起來可能重複保護同一個行為。列出來供判斷，**不表示應該刪**——要動的話回到 `implement-stepwise` / `implement-oneshot`，動完須重跑相關測試與本 skill。
+> 以下測試目前都有效，只是看起來可能重複保護同一個行為。列出來供判斷，**不表示應該刪**——要動的話回到 `implement-stepwise`，動完須重跑相關測試與本 skill。
 
 | 涉及的 VC | 測試 | 候選類型 | 疑點與併掉後由誰守 |
 | --- | --- | --- | --- |
@@ -335,8 +335,8 @@ description: 整條 branch 開發完畢、規格文件收斂完成後（`issue-d
 
 ## 下一步引導（純提示，不主動調用）
 
-- **有需補測試或覆蓋不足** → 這是新增保護、要走紅綠循環的實作工作，提示使用者回到 `implement-stepwise` / `implement-oneshot`，以一張「補測試」ticket 承載（驗收條件直接引用該批 `VC-xx`，implement 才有收尾可寫回的對象）；**把「待處理」表的建議層級一併帶進 ticket**，否則 seam 規劃會照缺口的現象描述落回昂貴層。補完後重跑本 skill。
+- **有需補測試或覆蓋不足** → 這是新增保護、要走紅綠循環的實作工作，提示使用者回到 `implement-stepwise`，以一張「補測試」ticket 承載（驗收條件直接引用該批 `VC-xx`，implement 才有收尾可寫回的對象）；**把「待處理」表的建議層級一併帶進 ticket**，否則 seam 規劃會照缺口的現象描述落回昂貴層。補完後重跑本 skill。
 - **接手的一律是 implement，不是 `to-change-request`。** 補測試與測試收斂都不改行為、不改設計決策、不改驗證條件，屬於 `to-change-request` 分流表上的「純實作」——那支 skill 在這種情況會直接停手請使用者去 implement，跑它只是多繞一圈。
 - **有可能已失效的測試** → 交由使用者判斷刪、改或留，本 skill 不動它。
-- **有潛在重複覆蓋** → 提示這是選用的 branch 層 cleanup（依 `implementation-rules.md` 的「branch 層 cleanup 是例外」）。**只刪或併測試、不動 production code 時，不必為它跑任何 skill**，直接改即可；同時要動 production code、或範圍大到需要逐步把關時，才回 `implement-stepwise`（優先，刪測試需要 commit 關卡讓人看一眼）／`implement-oneshot`；**動了測試就必須重跑受影響的測試專案並重跑本 skill**，確認沒有驗證條件因此失去覆蓋。不動也是合理選項。
+- **有潛在重複覆蓋** → 提示這是選用的 branch 層 cleanup（依 `implementation-rules.md` 的「branch 層 cleanup 是例外」）。**只刪或併測試、不動 production code 時，不必為它跑任何 skill**，直接改即可；同時要動 production code、或範圍大到需要逐步把關時，才回 `implement-stepwise`（刪測試需要 commit 關卡讓人看一眼）；**動了測試就必須重跑受影響的測試專案並重跑本 skill**，確認沒有驗證條件因此失去覆蓋。不動也是合理選項。
 - **全部收斂** → 提示使用者可回 `to-issue-doc` 以修訂模式，依本檔案逐條補上驗證條件的「驗證結果」欄，再與本檔案一起貼上主 Issue。（重案流程改回 `to-engineering-spec` 修訂，並以 `engineering-spec-deliverable` 產交付版。）

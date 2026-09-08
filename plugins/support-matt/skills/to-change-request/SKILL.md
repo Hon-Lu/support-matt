@@ -15,7 +15,7 @@ description: 開發中途發現需要改動時的再入點：接在 grill 之後
 （開發中途發現要改）
   → grill-me / grill-with-docs（使用者自己跑，取得共識）
   → [to-change-request]  ← 本 skill：分流 → 同步 spec → 同步 engineering-spec → 一個確認關卡 → 追加 ticket
-  → implement-stepwise / implement-oneshot
+  → implement-stepwise
 ```
 
 它**不是**主線流程的一站。第一次做這個功能時走的是 `to-spec → to-engineering-spec → to-tickets`；本 skill 只服務「已經有 spec、開發到一半、要改」這個情境。
@@ -119,7 +119,7 @@ description: 開發中途發現需要改動時的再入點：接在 grill 之後
 $implement-stepwise 依 .ai/.scratch/<feature-slug>/issues/<NN>-<slug>.md
 ```
 
-不需要逐 commit 過目時則給 `$implement-oneshot`。**本 skill 不自行調用任何 implement skill。**
+**本 skill 不自行調用任何 implement skill。**
 
 ## `spec.md` 的編輯授權
 
@@ -181,7 +181,7 @@ $to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 engineering-spec.md 重�
 
 本 skill **不負責**下列事項，出現時停下來導引使用者用對應的 skill：
 
-- 寫程式、跑測試（`implement-stepwise` / `implement-oneshot`）。
+- 寫程式、跑測試（`implement-stepwise`）。
 - review 程式碼（`code-review`）。
 - `engineering-spec.md` 的**定稿**（`to-engineering-spec` 定稿模式，發生在整條 branch 收尾時，不是每次改動）。
 - 產出交付版（`engineering-spec-deliverable`）、盤點測試覆蓋（`to-acceptance-map`）。

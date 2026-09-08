@@ -1,34 +1,32 @@
 ---
 name: implement-stepwise
-description: 在單一 session 內把一整張 ticket 做完，核心與 implement-oneshot 完全一致（開場規模評估、一次確認全部 seam、TDD、收尾寫回 ticket、收尾後不跑也不引導 code-review），只差兩件事：規模評估的上限比 oneshot 寬（因為有 commit 關卡兜底），以及每個 commit 送出之前停下來，附上完整的 commit message 與變更清單等使用者過目，使用者回「繼續」才由本 skill 執行 git commit 並接著做下一個 commit，直到下一個 commit 前再停；沒有更多 commit 時，收尾開始之前再停一次預告。不預先產出 commit checklist，也不把切分寫回 ticket——使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。適合邊界明確、預估 commit 五個以內的 ticket。當使用者要在單一 session 內做完一張小票、但希望每個 commit 送出前都能看一眼、必要時即時調整時使用。
+description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原生的 implement：開場先評估 ticket 規模、過重時建議回 to-tickets 拆小，動手前一次確認全部 seam，TDD，收尾跑受影響範圍測試並逐條核對驗收條件、寫回 ticket，收尾後不跑也不引導 code-review；每個 commit 送出之前停下來，附上完整的 commit message 與變更清單等使用者過目，使用者回「繼續」才由本 skill 執行 git commit 並接著做下一個 commit，直到下一個 commit 前再停；沒有更多 commit 時，收尾開始之前再停一次預告。不預先產出 commit checklist，也不把切分寫回 ticket——使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。適合邊界明確、預估 commit 五個以內的 ticket。當使用者要在單一 session 內做完一張小票、但希望每個 commit 送出前都能看一眼、必要時即時調整時使用。
 ---
 
 # implement-stepwise
 
 在**單一 session** 內把一整張 ticket 做完，但**每個 commit 送出之前停下來讓人過目**，使用者回「繼續」才提交並接續下一個 commit。
 
-本 skill 是 `implement-oneshot` 的變體：**核心流程、規範、收尾全部相同**，差別是 commit 的送出方式從「自動」改成「先停下、確認後才送」；因為有這道關卡兜底，規模評估的上限也比 oneshot 寬一級。
+本 skill 取代 Matt 原生的 `implement`，形狀貼近原生，差異在開場先評估 ticket 規模、每個 commit 送出前設關卡、收尾做完就結束，並在執行時套用 token 紀律。
 
-兩者的關係：
+本 skill 的形狀：
 
-| | `implement-oneshot` | `implement-stepwise` |
-| --- | --- | --- |
-| 執行單位 | 一整張 ticket | 一整張 ticket |
-| 人工關卡 | ticket 完成後一次 | 每個 commit 送出前 |
-| commit 送出方式 | 自動提交 | 確認後才提交 |
-| 規模上限 | 12 條驗收 / 3 commit / 100KB | 18 條驗收 / 5 commit / 150KB |
-| 事前知道每個 commit 要做什麼 | 否 | 否 |
-| context | 一路到底 | 一路到底 |
-| `/code-review` | 不執行、不引導 | 不執行、不引導 |
+- **執行單位**：一整張 ticket。
+- **人工關卡**：每個 commit 送出前，以及收尾開始之前那一次預告。
+- **commit 送出方式**：確認後才提交，不自動 commit。
+- **規模上限**：18 條驗收 / 5 commit / 150KB。
+- **事前知道每個 commit 要做什麼**：否，不產出 commit checklist。
+- **context**：一路到底，中途不清。
+- **`/code-review`**：不執行、不引導。
 
-**收尾之後就結束，沒有 code-review 這一步。** 收尾已經對本次 task 做過一輪驗收，單張票再跑一次審查是重複工；審查的位置在整條 branch 做完之後的 `to-code-review`。真的要對單一 task 跑審查時，改調用 Matt 原生的 `implement`。
+**收尾之後就結束，沒有 code-review 這一步。** 原生的 `implement` 做完會**直接執行** `/code-review`，本 skill 把那一步整段拿掉——收尾已經對本次 task 做過一輪驗收，單張票再跑一次審查是重複工；審查的位置在整條 branch 做完之後的 `to-code-review`。真的要對單一 task 跑審查時，改調用 Matt 原生的 `implement`。
 
 **關卡只有兩種。** 本 skill **不做事前規劃審查、不產出 commit checklist、不寫任何東西回 ticket 當進度狀態**——關卡就在 commit 送出前的那一刻，讓使用者看一眼這次要提交什麼、commit message 寫得對不對，需要時即時插手；加上收尾開始之前的那一次預告（第 5 節），讓最後一次插手的機會不會靜默過去。
 
 ## 核心行為規範（最高優先，調用時必須遵守）
 
 - **開場必須先做規模評估**，未評估不得開始實作。
-- **任何情況下都不得直接 `git commit`。** 每個 commit 都必須先停下回報並取得使用者確認。這是本 skill 與 `implement-oneshot` 最關鍵的差異，也是它存在的理由——違反這條，本 skill 就等同 `implement-oneshot`。
+- **任何情況下都不得直接 `git commit`。** 每個 commit 都必須先停下回報並取得使用者確認。這道關卡是本 skill 存在的理由——違反這條，它就只是一支不會停的 implement。
 - **使用者確認後不再多問。** 執行 commit，直接接續實作下一個 commit，做到下一個 commit 送出前再停。**不在 commit 之後另外徵詢要不要繼續。**
 - **收尾開始之前一律停一次**（第 5 節），這是唯一的例外，不得跳過。
 - **不產出 commit checklist、不寫進度狀態回 ticket。** 使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。（收尾的驗收核對結果仍要寫回 ticket，見第 5 節。）
@@ -58,7 +56,7 @@ description: 在單一 session 內把一整張 ticket 做完，核心與 impleme
 
 讀完 ticket 後，先評估它適不適合在單一 session 內做完，再決定是否繼續。
 
-本 skill 的上限比 `implement-oneshot` 寬：每個 commit 前都有關卡，跑歪或誤解需求當場就會被攔下，不會整張票做完才發現。但上限仍然存在——單一 session 一路不清 context，工作量堆過頭時品質會掉，那是關卡攔不住的。
+上限之所以能放到這個程度，是因為每個 commit 前都有關卡：跑歪或誤解需求當場就會被攔下，不會整張票做完才發現。但上限仍然存在——單一 session 一路不清 context，工作量堆過頭時品質會掉，那是關卡攔不住的。
 
 **出現下列任一情況，停下來建議使用者回 `to-tickets` 把票拆小：**
 
@@ -177,7 +175,7 @@ feat: 新增 X 的查詢路徑
 
 依 `implementation-rules.md` 的「收尾」執行——跑受影響範圍的測試、**做一次跨層重複檢查**、逐條核對驗收條件、**把核對結果寫回 ticket**（勾選達成項 + append 帶證據的核對表）、回報。**不詢問冷眼審查**（覆寫 `implementation-rules.md` 收尾步驟 6——那一步在本 skill 不執行），**不跑完整測試套件**（那是 `to-acceptance-map` 在 branch 結束時的工作），**不判斷 scope creep 或實作對錯**，**不開 sub-agent**。
 
-**寫回 ticket 對本 skill 特別重要。** 它和 `implement-oneshot` 一樣不在 ticket 留下 Commit checklist，若核對結果也只留在對話裡，這張票在檔案上就完全沒有交付紀錄。因此在核對表的「依據」欄一併帶入各 commit 的測試名稱（邊做邊記的內容），讓 ticket 自己說得出這張票交付了什麼、由什麼證明；本票有做 Test Consolidation 時，也依「寫回 ticket」在表格後補一行摘要——關卡上講過的刪／併只留在對話裡，ticket 上會看不出測試為什麼變少。
+**寫回 ticket 對本 skill 特別重要。** 本 skill 不在 ticket 留下 Commit checklist，若核對結果也只留在對話裡，這張票在檔案上就完全沒有交付紀錄。因此在核對表的「依據」欄一併帶入各 commit 的測試名稱（邊做邊記的內容），讓 ticket 自己說得出這張票交付了什麼、由什麼證明；本票有做 Test Consolidation 時，也依「寫回 ticket」在表格後補一行摘要——關卡上講過的刪／併只留在對話裡，ticket 上會看不出測試為什麼變少。
 
 收尾階段測試失敗或有驗收條件未達成時，**先回報，不要自己修掉**。使用者要修的話，那份修正也是一個 commit，照樣走第 4 節的關卡；把核對表寫回 ticket 的動作，等修正提交後再做，避免留下與程式碼不符的紀錄。
 
@@ -203,4 +201,4 @@ ticket 的驗收條件有誤時，建議使用者回到 `to-tickets` 修正，�
 - **ticket 完成** → 提示清空 context，取下一張 blocker 已滿足的 ticket。
 - **整條 branch 的 ticket 全部完成** → 提示開新 session 執行 `to-acceptance-map` 做獨立的驗收覆蓋盤點。
 - **中途發現票太重** → 提示回 `to-tickets` 拆小。
-- **覺得每個 commit 都停太煩** → 提示改用 `implement-oneshot`，流程完全相同，只是不停。
+- **覺得每個 commit 都停太煩** → 提示改用 Matt 原生的 `implement`，但要一併講清楚代價：沒有規模評估、沒有 commit 關卡、沒有 token 紀律，收尾會跑完整測試套件並直接執行 `/code-review`。

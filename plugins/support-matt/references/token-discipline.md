@@ -1,6 +1,6 @@
 # Token 紀律
 
-`implement-stepwise` 與 `implement-oneshot` 共用。修改本檔會同時影響兩者。
+`implement-stepwise` 使用。
 
 以下每一條都對應實測中確認過的浪費。共同前提：**留進 context 的內容無法移除，之後每一個回合都會重送**——所以錯誤的讀取方式不是付一次錢，是付到 session 結束。
 

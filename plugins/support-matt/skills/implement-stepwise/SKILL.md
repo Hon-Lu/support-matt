@@ -35,10 +35,12 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 
 ## 共用規範（必讀）
 
-動手前先讀這兩份，位於 plugin 的 `references/` 目錄（相對本 skill 為 `../../references/`）：
+位於 plugin 的 `references/` 目錄（相對本 skill 為 `../../references/`），**依標示的時點各讀一次**：
 
-- **`token-discipline.md`** —— 探索優先序（圖譜優先）、三條防呆、回合數成本。**本 skill 一路不清 context**：一次錯誤的讀取會跟著整張 ticket 的每一個回合重送。
-- **`implementation-rules.md`** —— TDD 三條覆寫、Test Consolidation、程式碼與註解規範、commit 格式、邊做邊記。
+- **`token-discipline.md`**（動手前）—— 探索優先序（圖譜優先）、三條防呆、回合數成本。**本 skill 一路不清 context**：一次錯誤的讀取會跟著整張 ticket 的每一個回合重送。
+- **`implementation-rules.md`**（動手前）—— TDD 三條覆寫、程式碼與註解規範、commit 格式、邊做邊記。
+- **`testing-rules.md`**（第 2 節列 seam 之前）—— 測試層級的入場規則與成本歸屬、Test Consolidation、重跑範圍。
+- **`wrap-up-rules.md`**（第 5 節收尾動作開始時）—— 收尾步驟、跨層重複檢查、驗收條件判定、寫回 ticket。
 
 其中 **TDD 覆寫 1（seam 只確認一次）** 在本流程的落點是：**規模評估之後、動手之前**一次列出全部 seam 並取得確認，之後不再逐一重問。**commit 關卡不是重問 seam 的地方**——那裡只審這次要提交的東西。但覆寫 1 另有一條：實作中發現 seam 判斷錯誤而**要擴大測試範圍時，當場停下說明並取得確認**，那是獨立於關卡的例外，不要憋到關卡才講——測試那時已經寫完了。
 
@@ -83,7 +85,7 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 
 1. **探索 codebase 現況**，依 `token-discipline.md` 的優先序。
 2. 列出預計的 commit 切分，以及每個 commit 要測試的 **seam**。
-3. **打算落在昂貴層（整合、UI／E2E）的 seam，逐個說出它為什麼不能放在便宜層**——依 `implementation-rules.md` 的「測試層級」入場規則，先拿它要斷言的旗標／欄位／規則名回便宜層的測試類別搜尋，再下判斷。這裡是修正層級最便宜的時點。
+3. **打算落在昂貴層（整合、UI／E2E）的 seam，逐個說出它為什麼不能放在便宜層**——依 `testing-rules.md` 的「測試層級」入場規則，先拿它要斷言的旗標／欄位／規則名回便宜層的測試類別搜尋，再下判斷。這裡是修正層級最便宜的時點。
 4. 給使用者確認一次——這同時滿足 `/tdd` 的「seam 必須事先確認」要求。
 5. 確認後直接往下實作。
 
@@ -96,9 +98,9 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 - **新增或改變 observable behavior 的 commit 走完整的紅綠循環**（是否走 TDD 不由你判斷）；**純 behavior-preserving refactor 走另一條路徑**——先確認既有測試涵蓋該行為且為綠，重構後重跑仍為綠，不得為了看到 RED 而硬生一支沒有新行為的測試。兩條路徑的細節見 `implementation-rules.md` 的 TDD 覆寫 2。測試與實作同屬一個 commit。
 - **定期執行 typecheck，並跑與當下變更相關的測試**；不要累積到最後才一次驗證。範圍依測試性質分流：
   - **不寫外部狀態的測試（純單元測試）** —— 整個測試檔跑完。沒有副作用，順帶擋住同檔既有測試的回歸。
-  - **會寫 DB、檔案等外部狀態的測試（整合測試、UI 測試）** —— 只跑本次新增或修改的測試方法。整檔逐 commit 重複跑會反覆寫入測試資料，同檔其餘測試留給收尾那一輪的測試專案全跑。**兩個例外**：本次是收斂型 commit（刪、併、改既有測試）時整個測試類別跑完，本次動到共用測試基礎設施（base class、fixture、測試替身）時整個測試專案跑完——見 `implementation-rules.md` 的「重跑範圍」。
+  - **會寫 DB、檔案等外部狀態的測試（整合測試、UI 測試）** —— 只跑本次新增或修改的測試方法。整檔逐 commit 重複跑會反覆寫入測試資料，同檔其餘測試留給收尾那一輪的測試專案全跑。**兩個例外**：本次是收斂型 commit（刪、併、改既有測試）時整個測試類別跑完，本次動到共用測試基礎設施（base class、fixture、測試替身）時整個測試專案跑完——見 `testing-rules.md` 的「重跑範圍」。
   - **分流依你手上已有的資訊判定，不另外開調查。** 依據是本次寫測試時已經看過的東西（測試檔的 arrange 段、繼承的 base class、用的是替身還是真實 DbContext）。**不要為了判定去追 base class、fixture、DI 註冊或設定檔**——那條相依鏈讀下去的成本遠超過它省的測試時間。判斷不出來就當作會寫外部狀態，只跑本次新增的。
-- **GREEN 與重構完成後、走下一節的關卡之前**，依 `implementation-rules.md` 的「Test Consolidation」檢視本次新增或修改的測試（**含它們落進的同構家族是否因此達到門檻——昂貴層數 case 數、便宜層數方法數**，以及本次是否往既有參數化測試加了說不出獨立保護對象的 `DataRow`），把只為驅動 TDD 而生的暫時性測試併掉或刪掉，並重跑受影響的測試確認仍是綠的。使用者在關卡看到的，應該就是這個行為最終要留在 repo 裡的測試。**不得另開 cleanup commit 補做。**
+- **GREEN 與重構完成後、走下一節的關卡之前**，依 `testing-rules.md` 的「Test Consolidation」檢視本次新增或修改的測試（**含它們落進的同構家族是否因此達到門檻——昂貴層數 case 數、便宜層數方法數**，以及本次是否往既有參數化測試加了說不出獨立保護對象的 `DataRow`），把只為驅動 TDD 而生的暫時性測試併掉或刪掉，並重跑受影響的測試確認仍是綠的。使用者在關卡看到的，應該就是這個行為最終要留在 repo 裡的測試。**不得另開 cleanup commit 補做。**
 - 每個 commit 的變更就緒後，**不要 commit**，改走下一節的關卡。
 
 ## 4. commit 關卡（本 skill 的核心）
@@ -173,7 +175,7 @@ feat: 新增 X 的查詢路徑
 
 ### 收尾動作
 
-依 `implementation-rules.md` 的「收尾」執行——跑受影響範圍的測試、**做一次跨層重複檢查**、逐條核對驗收條件、**把核對結果寫回 ticket**（勾選達成項 + append 帶證據的核對表）、回報。**不詢問冷眼審查**（覆寫 `implementation-rules.md` 收尾步驟 6——那一步在本 skill 不執行），**不跑完整測試套件**（那是 `to-acceptance-map` 在 branch 結束時的工作），**不判斷 scope creep 或實作對錯**，**不開 sub-agent**。
+依 `wrap-up-rules.md` 的「收尾」執行——跑受影響範圍的測試、**做一次跨層重複檢查**、逐條核對驗收條件、**把核對結果寫回 ticket**（勾選達成項 + append 帶證據的核對表）、回報。**不詢問冷眼審查**（覆寫 `wrap-up-rules.md` 收尾步驟 6——那一步在本 skill 不執行），**不跑完整測試套件**（那是 `to-acceptance-map` 在 branch 結束時的工作），**不判斷 scope creep 或實作對錯**，**不開 sub-agent**。
 
 **寫回 ticket 對本 skill 特別重要。** 本 skill 不在 ticket 留下 Commit checklist，若核對結果也只留在對話裡，這張票在檔案上就完全沒有交付紀錄。因此在核對表的「依據」欄一併帶入各 commit 的測試名稱（邊做邊記的內容），讓 ticket 自己說得出這張票交付了什麼、由什麼證明；本票有做 Test Consolidation 時，也依「寫回 ticket」在表格後補一行摘要——關卡上講過的刪／併只留在對話裡，ticket 上會看不出測試為什麼變少。
 

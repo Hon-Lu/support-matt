@@ -55,12 +55,14 @@ grill-with-docs → to-spec ─┬─ 設計後補　 → [to-issue-doc brief] �
 
 `implement-stepwise` 取代 Matt 的 `implement`，內部調用其 `tdd`，開場先評估 ticket 規模、過重時建議你回 `to-tickets` 拆小，每個 commit 送出前停下讓你過目（附完整 commit message），收尾做完就結束——**不跑也不引導 `code-review`**，審查統一留到整條 branch 完成後的 `to-code-review`。不想在 commit 送出前插手時，直接用 Matt 原生的 `implement` 即可，本 plugin 不另外提供不停的版本。
 
-實作規範由兩份 reference 提供（`plugins/support-matt/references/`）：
+實作規範由四份 reference 提供（`plugins/support-matt/references/`），`implement-stepwise` 依階段各讀一次：
 
 | Reference | 內容 |
 | --- | --- |
 | `token-discipline.md` | 探索優先序（圖譜優先）、三條防呆、回合數成本 |
-| `implementation-rules.md` | TDD 三條覆寫、測試層級（入場規則與成本歸屬）、Test Consolidation、程式碼與註解規範、commit 格式、邊做邊記 |
+| `implementation-rules.md` | TDD 三條覆寫、程式碼與註解規範、commit 格式、邊做邊記 |
+| `testing-rules.md` | 測試層級（入場規則與成本歸屬）、Test Consolidation、重跑範圍 |
+| `wrap-up-rules.md` | 收尾步驟、跨層重複檢查、驗收條件判定、寫回 ticket |
 
 其中 **Test Consolidation** 是為了壓住 TDD 的測試膨脹：GREEN 之後、commit 之前檢視本次新增或修改的測試，把只為取得 RED/GREEN 回饋而生的暫時性測試、重複的 observable behavior 覆蓋、可參數化的同質 cases，以及沒有保護不同風險的跨層級重複併掉或刪掉，讓每個 commit 直接帶進值得長期保留的那一份，**不留 `test: remove redundant tests` 這種收尾 commit**。驗收條件與測試**不要求 1:1**，要成立的是覆蓋的可追溯性。跨 ticket 才浮現的重複由 `to-acceptance-map` 偵測回報，屬於例外的 branch 層 cleanup。
 

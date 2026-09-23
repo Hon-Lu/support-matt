@@ -52,7 +52,7 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 2. `.ai/docs/agents/domain.md` — `CONTEXT.md` 與 ADR 的位置。依它指出的路徑讀取；檔案不存在時**靜默略過**。
 3. 目標 ticket 檔案本身。
 
-**不要主動去讀 `spec.md` / `engineering-spec.md`。** ticket 應當自足；真的缺資訊時才回頭撈，並在回報中指出 ticket 哪裡不足。這兩份合計可達 50KB 以上，而本 skill 一路不清 context——讀進來就會跟著每一個回合重送到結束。
+**不要主動去讀 `spec.md` / `engineering-spec.md` / `issue-doc.md`。** ticket 應當自足；真的缺資訊時才回頭撈相關章節，並在回報中指出 ticket 哪裡不足。專案設定檔要求實作前先讀這些文件時，以本規則為準。這幾份合計可達 50KB 以上，而本 skill 一路不清 context——讀進來就會跟著每一個回合重送到結束。
 
 ## 1. 規模評估（不得跳過）
 

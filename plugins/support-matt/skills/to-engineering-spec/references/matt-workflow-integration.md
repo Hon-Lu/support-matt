@@ -87,7 +87,7 @@ Matt 的 `to-tickets` 只在使用者傳入 reference 時才會 fetch，`impleme
 在 `.ai/.scratch/<feature-slug>/spec.md` 最上方（標題之後）加一行：
 
 ```markdown
-> Engineering spec: [engineering-spec.md](./engineering-spec.md) — 系統分析、設計決策與實作約束的權威。拆票與實作前請一併閱讀。
+> Engineering spec: [engineering-spec.md](./engineering-spec.md) — 系統分析、設計決策與實作約束的權威。拆票與 review 時一併閱讀；實作以 ticket 為準。
 ```
 
 這是**本 skill 唯一**允許對 Matt Spec 做的改動：一行指標，不是內容，不與需求權威競爭。任何 skill 只要 fetch 了 spec.md 就會看到它。
@@ -113,7 +113,7 @@ $to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-sl
 ```markdown
 ### Engineering spec
 
-需要正式 SA / SD 的功能，在 `to-spec` 之後、`to-tickets` 之前產出 `.ai/.scratch/<feature>/engineering-spec.md`。拆票、實作與 review 前一併閱讀。見 `.ai/docs/agents/engineering-spec.md`。
+需要正式 SA / SD 的功能，在 `to-spec` 之後、`to-tickets` 之前產出 `.ai/.scratch/<feature>/engineering-spec.md`。拆票與 review 時一併閱讀；實作以 ticket 為準，ticket 不足時才回頭查相關章節。見 `.ai/docs/agents/engineering-spec.md`。
 ```
 
 並寫 `.ai/docs/agents/engineering-spec.md`：
@@ -128,7 +128,8 @@ $to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-sl
 
 ## 給 to-tickets / implement / code-review 的規則
 
-- 兩份都讀。`spec.md` 決定要做什麼，`engineering-spec.md` 決定怎麼做才算沒做錯。
+- 拆票與 review 時兩份都讀。`spec.md` 決定要做什麼，`engineering-spec.md` 決定怎麼做才算沒做錯。
+- 實作以 ticket 為準，不主動讀這兩份；ticket 不足時才回頭查相關章節，並回報 ticket 缺了什麼。拆票時已把設計決策帶進 ticket，實作再讀一次只是重複。
 - **設計決策**（`> **設計決策**：` 或資料表 / 介面契約 / 交易邊界等章節）是硬約束。要改，先回 `to-engineering-spec` 修訂文件。
 - **實作方向**（`> **實作方向**：`）可依 codebase 現況調整，但要在 Ticket 或 PR 記錄原因。靜默偏離視同缺陷。
 - **實作示意**（程式碼區塊上方標了「非固定簽章」）不是契約，不要照抄簽章。

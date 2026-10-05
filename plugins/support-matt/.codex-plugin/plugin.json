@@ -15,7 +15,7 @@
   "interface": {
     "displayName": "Support Matt",
     "shortDescription": "Matt 工作流的補強 skill 集",
-    "longDescription": "沿用 Matt Pocock 的流程骨架，補上公司實務需要、但 Matt 流程未涵蓋的環節。收錄 setup-matt-preset（per-repo 初始化）、to-issue-doc 與 to-engineering-spec（兩種撰寫時點的規格文件）、engineering-spec-deliverable（產出可直接貼上 GitLab Issue 的交付版）、implement-stepwise（取代 implement，每個 commit 送出前停一次、收尾後不跑 code-review）、to-acceptance-map（驗收覆蓋盤點）與 to-change-request（開發中途改動的再入點）。",
+    "longDescription": "沿用 Matt Pocock 的流程骨架，補上公司實務需要、但 Matt 流程未涵蓋的環節。收錄 setup-matt-preset（per-repo 初始化）、to-issue-doc 與 to-engineering-spec（兩種撰寫時點的規格文件）、engineering-spec-deliverable（產出可直接貼上 GitLab Issue 的交付版）、implement-stepwise（取代 implement，每個 commit 送出前停一次、收尾後只在命中條件時建議 code-review）、to-acceptance-map（驗收覆蓋盤點）與 to-change-request（開發中途改動的再入點）。",
     "developerName": "Hon.Lu",
     "category": "Developer Tools",
     "capabilities": [

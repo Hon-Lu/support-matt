@@ -1,6 +1,6 @@
 ---
 name: implement-stepwise
-description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原生的 implement：開場先評估 ticket 規模、過重時建議回 to-tickets 拆小，動手前一次確認全部 seam，TDD，收尾跑受影響範圍測試並逐條核對驗收條件、寫回 ticket，收尾後不跑也不引導 code-review；每個 commit 送出之前停下來，附上完整的 commit message 與變更清單等使用者過目，使用者回「繼續」才由本 skill 執行 git commit 並接著做下一個 commit，直到下一個 commit 前再停；沒有更多 commit 時，收尾開始之前再停一次預告。不預先產出 commit checklist，也不把切分寫回 ticket——使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。適合邊界明確、預估 commit 五個以內的 ticket。當使用者要在單一 session 內做完一張小票、但希望每個 commit 送出前都能看一眼、必要時即時調整時使用。
+description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原生的 implement：開場先評估 ticket 規模、過重時建議回 to-tickets 拆小，動手前一次確認全部 seam，TDD，收尾跑受影響範圍測試並逐條核對驗收條件、寫回 ticket，收尾後不自動跑 code-review，只在命中條件時建議；每個 commit 送出之前停下來，附上完整的 commit message 與變更清單等使用者過目，使用者回「繼續」才由本 skill 執行 git commit 並接著做下一個 commit，直到下一個 commit 前再停；沒有更多 commit 時，收尾開始之前再停一次預告。不預先產出 commit checklist，也不把切分寫回 ticket——使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。適合邊界明確、預估 commit 五個以內的 ticket。當使用者要在單一 session 內做完一張小票、但希望每個 commit 送出前都能看一眼、必要時即時調整時使用。
 ---
 
 # implement-stepwise
@@ -17,9 +17,9 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 - **規模上限**：18 條驗收 / 5 commit / 150KB。
 - **事前知道每個 commit 要做什麼**：否，不產出 commit checklist。
 - **context**：一路到底，中途不清。
-- **`/code-review`**：不執行、不引導。
+- **`/code-review`**：不執行；命中條件時在收尾回報建議一行。
 
-**收尾之後就結束，沒有 code-review 這一步。** 原生的 `implement` 做完會**直接執行** `/code-review`，本 skill 把那一步整段拿掉——收尾已經對本次 task 做過一輪驗收，單張票再跑一次審查是重複工。真的要對單一 task 跑審查時，改調用 Matt 原生的 `implement`。
+**收尾之後就結束，code-review 只在命中條件時建議。** 原生的 `implement` 做完會**直接執行** `/code-review`，本 skill 把那一步拿掉——收尾已經對本次 task 做過一輪驗收，多數單張票再跑一次審查是重複工。只有 ticket 有硬約束可對照、實作偏離計畫或 diff 動到高風險區域時，才在回報最後建議一行，條件見 `wrap-up-rules.md` 的「建議冷眼審查」。
 
 **關卡只有兩種。** 本 skill **不做事前規劃審查、不產出 commit checklist、不寫任何東西回 ticket 當進度狀態**——關卡就在 commit 送出前的那一刻，讓使用者看一眼這次要提交什麼、commit message 寫得對不對，需要時即時插手；加上收尾開始之前的那一次預告（第 5 節），讓最後一次插手的機會不會靜默過去。
 
@@ -30,7 +30,7 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 - **使用者確認後不再多問。** 執行 commit，直接接續實作下一個 commit，做到下一個 commit 送出前再停。**不在 commit 之後另外徵詢要不要繼續。**
 - **收尾開始之前一律停一次**（第 5 節），這是唯一的例外，不得跳過。
 - **不產出 commit checklist、不寫進度狀態回 ticket。** 使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。（收尾的驗收核對結果仍要寫回 ticket，見第 5 節。）
-- **不執行 `/code-review`，也不詢問、不提示、不列選項。** 收尾結束就是本 skill 的終點；commit 關卡拿到的「繼續」更不構成執行審查的授權。
+- **不執行 `/code-review`。** 只在命中 `wrap-up-rules.md` 的條件時於回報最後建議一行，不詢問、不列選項；沒命中就不提。收尾結束就是本 skill 的終點；commit 關卡拿到的「繼續」更不構成執行審查的授權。
 - **只處理一張 ticket。** 不得跨 ticket 作業。
 
 ## 共用規範（必讀）
@@ -175,7 +175,7 @@ feat: 新增 X 的查詢路徑
 
 ### 收尾動作
 
-依 `wrap-up-rules.md` 的「收尾」執行——跑受影響範圍的測試、**做一次跨層重複檢查**、逐條核對驗收條件、**把核對結果寫回 ticket**（勾選達成項 + append 帶證據的核對表）、回報。**不詢問冷眼審查**（覆寫 `wrap-up-rules.md` 收尾步驟 6——那一步在本 skill 不執行），**不跑完整測試套件**（那是 `to-acceptance-map` 在 branch 結束時的工作），**不判斷 scope creep 或實作對錯**，**不開 sub-agent**。
+依 `wrap-up-rules.md` 的「收尾」執行——跑受影響範圍的測試、**做一次跨層重複檢查**、逐條核對驗收條件、**把核對結果寫回 ticket**（勾選達成項 + append 帶證據的核對表）、回報，命中條件時在回報最後建議冷眼審查。**不跑完整測試套件**（那是 `to-acceptance-map` 在 branch 結束時的工作），**不判斷 scope creep 或實作對錯**，**不開 sub-agent**。
 
 **寫回 ticket 對本 skill 特別重要。** 本 skill 不在 ticket 留下 Commit checklist，若核對結果也只留在對話裡，這張票在檔案上就完全沒有交付紀錄。因此在核對表的「依據」欄一併帶入各 commit 的測試名稱（邊做邊記的內容），讓 ticket 自己說得出這張票交付了什麼、由什麼證明；本票有做 Test Consolidation 時，也依「寫回 ticket」在表格後補一行摘要——關卡上講過的刪／併只留在對話裡，ticket 上會看不出測試為什麼變少。
 
@@ -183,7 +183,7 @@ feat: 新增 X 的查詢路徑
 
 回報時一併列出全部 commit 清單（含各自的 commit message）。
 
-**回報完就停。** 不追問下一步、不提 code-review、不建議任何後續審查動作。
+**回報完就停。** 不追問下一步；審查只有命中條件時的那一行建議，不另外追問或列選項。
 
 ## 暫停與回報
 

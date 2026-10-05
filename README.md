@@ -27,7 +27,6 @@
 | `implement-stepwise` | 取代 `implement`（**即時插手**）：單一 session 做完整張票，形狀貼近原生，但開場先評估規模、每個 commit 送出前停下附完整 commit message 與變更清單等你過目，回「繼續」才提交並接著做下一個；沒有更多 commit 時收尾開始前再停一次預告；收尾（測試 + 逐條核對驗收條件 + 寫回 ticket）做完即結束，**不跑也不引導 `code-review`**。不預先產 commit checklist。 |
 | `to-acceptance-map` | branch 開發完畢後於**獨立 session** 盤點測試覆蓋，產出 `acceptance-map.md`。驗證基準只認規格文件的 `VC-xx`，不拿 ticket 充數。四級判定區分「需補測試」與「不適用測試」，另檢出可能已失效的測試與潛在重複覆蓋（只偵測、不動測試）。回報只呈現例外，全程唯讀。 |
 | `to-change-request` | 開發中途改動的**再入點**：grill 完接這一支，一次做完 `spec.md` delta、規格文件修訂（委派給該 feature 實際用的 `to-issue-doc` 或 `to-engineering-spec`）與追加 ticket，一個確認關卡。純實作的改動直接請你去 implement，不動文件。 |
-| `to-code-review` | Matt `code-review` 的**上層入口**：自家 branch 只需給目標分支，規格由 feature 目錄自動取得、`REVIEW.md` 寫回該目錄；代審他人 MR 則另外要背景說明，寫到 `.ai/code-review/`。兩軸結果一律過證據門檻後才輸出 P0–P3 findings。 |
 
 掛載位置：
 
@@ -43,17 +42,14 @@ grill-with-docs → to-spec ─┬─ 設計後補　 → [to-issue-doc brief] �
                                                                           ↓
                                                               整條 branch 的 ticket 全部完成（以下開新 session）
                                                                           ↓
-        設計後補　：[to-issue-doc final]（補齊交付內容）→ [to-acceptance-map] ─┐
-        設計先定版：[to-acceptance-map] → [to-engineering-spec 定稿] ──────────┤
-                                                                          ↓
-                                                              [to-code-review]（發 MR 前最後一關，自行 Code Review 驗證）
+        設計後補　：[to-issue-doc final]（補齊交付內容）→ [to-acceptance-map]
+        設計先定版：[to-acceptance-map] → [to-engineering-spec 定稿]
 
 開發中途要改：grill-me / grill-with-docs → [to-change-request] → implement-stepwise
               （文件同步由 to-change-request 委派給這個 feature 實際用的那一份：to-issue-doc 或 to-engineering-spec 的修訂模式）
-代審他人 MR：[to-code-review]（模式 B），與上面的 pipeline 無關
 ```
 
-`implement-stepwise` 取代 Matt 的 `implement`，內部調用其 `tdd`，開場先評估 ticket 規模、過重時建議你回 `to-tickets` 拆小，每個 commit 送出前停下讓你過目（附完整 commit message），收尾做完就結束——**不跑也不引導 `code-review`**，審查統一留到整條 branch 完成後的 `to-code-review`。不想在 commit 送出前插手時，直接用 Matt 原生的 `implement` 即可，本 plugin 不另外提供不停的版本。
+`implement-stepwise` 取代 Matt 的 `implement`，內部調用其 `tdd`，開場先評估 ticket 規模、過重時建議你回 `to-tickets` 拆小，每個 commit 送出前停下讓你過目（附完整 commit message），收尾做完就結束——**不跑也不引導 `code-review`**。不想在 commit 送出前插手時，直接用 Matt 原生的 `implement` 即可，本 plugin 不另外提供不停的版本。
 
 實作規範由四份 reference 提供（`plugins/support-matt/references/`），`implement-stepwise` 依階段各讀一次：
 

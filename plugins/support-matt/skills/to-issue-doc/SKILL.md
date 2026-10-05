@@ -154,7 +154,7 @@ $to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-sl
 1. **該約束本身已經寫進「關鍵決策」章**——VC 只負責寫「怎麼驗證那條決策成立」，不負責發明它。
 2. **違反它會造成使用者觀察不到、但不可接受的後果**——例如資料外洩、既有機制被繞過。
 
-**沒被寫成關鍵決策的實作要求一律不進本表**：隨手寫出來的 N+1、要不要 eager load、共用哪個 helper、繼承結構、方法名，那些是 coding standard 與 `to-code-review` 的事。寫進規格既擋不住也追不了，還會讓文件被下一次 refactor 弄成假的。這與 `to-engineering-spec` 的判準一致。
+**沒被寫成關鍵決策的實作要求一律不進本表**：隨手寫出來的 N+1、要不要 eager load、共用哪個 helper、繼承結構、方法名，那些是 coding standard 與 code review 的事。寫進規格既擋不住也追不了，還會讓文件被下一次 refactor 弄成假的。這與 `to-engineering-spec` 的判準一致。
 
 真的收進來的那幾條，也要寫成**可觀察的性質，不是目前的實作形狀**：
 
@@ -353,7 +353,6 @@ final 完成的文件會被整份貼進 GitLab，因此：
 
 - **`to-tickets`** 讀 `spec.md` 與本文件的 brief 拆票（`方案輪廓`、`關鍵決策` 是切分的輸入）；本 skill 不自己拆、不調用它、不改 `issues/`。拆票過程若發現 brief 的方案輪廓站不住，回本 skill 修訂模式，不要在票裡默默改設計。
 - **`to-acceptance-map`** 讀本文件的 `VC-xx`；本 skill 不做覆蓋盤點，也不把測試結果寫進本文件。
-- **`to-code-review`** 與本文件無耦合。
 
 ## 下一步引導（純提示，不主動調用）
 

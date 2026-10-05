@@ -19,7 +19,7 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 - **context**：一路到底，中途不清。
 - **`/code-review`**：不執行、不引導。
 
-**收尾之後就結束，沒有 code-review 這一步。** 原生的 `implement` 做完會**直接執行** `/code-review`，本 skill 把那一步整段拿掉——收尾已經對本次 task 做過一輪驗收，單張票再跑一次審查是重複工；審查的位置在整條 branch 做完之後的 `to-code-review`。真的要對單一 task 跑審查時，改調用 Matt 原生的 `implement`。
+**收尾之後就結束，沒有 code-review 這一步。** 原生的 `implement` 做完會**直接執行** `/code-review`，本 skill 把那一步整段拿掉——收尾已經對本次 task 做過一輪驗收，單張票再跑一次審查是重複工。真的要對單一 task 跑審查時，改調用 Matt 原生的 `implement`。
 
 **關卡只有兩種。** 本 skill **不做事前規劃審查、不產出 commit checklist、不寫任何東西回 ticket 當進度狀態**——關卡就在 commit 送出前的那一刻，讓使用者看一眼這次要提交什麼、commit message 寫得對不對，需要時即時插手；加上收尾開始之前的那一次預告（第 5 節），讓最後一次插手的機會不會靜默過去。
 

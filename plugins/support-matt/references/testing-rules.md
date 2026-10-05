@@ -132,7 +132,7 @@ TestImportPost_WithoutSendPermission_Returns403()  …
 | 其他（只新增測試，沒動到既有的） | 維持只跑本次新增或修改的測試方法 |
 
 - **這個例外只開給昂貴層。** 便宜層本來就整檔跑，不受影響。
-- 前兩種情況都會多寫一輪測試資料，**那是刻意付的代價**：動了既有測試卻沒整類別跑過，等於把驗證延後到收尾，而收尾那時已經沒有 commit 關卡可以攔。
+- 前兩種情況都會多寫一輪測試資料，**那是刻意付的代價**：動了既有測試卻沒整類別跑過，等於把驗證延後到收尾，到那時才發現就只能另開修正 commit。
 - **分流依你手上已有的資訊判定，不另外開調查**；判斷不出來時，按「有動到既有測試就整類別跑」處理。
 - 實際跑了哪個範圍要寫進該 commit 的回報，不得含糊寫成「測試通過」。
 
@@ -157,7 +157,7 @@ TestImportPost_WithoutSendPermission_Returns403()  …
 
 ### 不要留下 cleanup commit
 
-consolidation 是該 commit 的一部分，發生在 commit **之前**。每個 implementation commit 直接包含這個行為最終值得永久保留的 production code 與測試，**不要另外產生 `test: remove redundant tests` 這類收尾 commit**——TDD 中途為取得回饋而生的暫時性測試，本來就不需要進 git history。
+consolidation 是該 commit 的一部分，發生在 commit **之前**。每個 implementation commit 直接包含這個行為最終值得永久保留的 production code 與測試，**不要另外產生 `test: remove redundant tests` 這類收尾 commit**——TDD 中途為取得回饋而生的暫時性測試，本來就不需要進 git history。唯一的例外是收尾的跨層重複檢查（見 `wrap-up-rules.md`）：跨層重複要等兩層都寫完才看得到，刪併只能另走一個 `test:` commit。
 
 ### 驗收條件與測試不是 1:1
 

@@ -1,5 +1,5 @@
 interface:
   display_name: "To Change Request"
-  short_description: "開發中途改動的再入點：同步兩份規格並追加 ticket"
+  short_description: "開發中途改動的再入點：同步兩份規格並修訂未完成的 ticket"
 policy:
   allow_implicit_invocation: false

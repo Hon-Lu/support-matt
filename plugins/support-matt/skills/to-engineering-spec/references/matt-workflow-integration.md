@@ -92,7 +92,7 @@ Matt 的 `to-tickets` 只在使用者傳入 reference 時才會 fetch，`impleme
 
 這是**本 skill 唯一**允許對 Matt Spec 做的改動：一行指標，不是內容，不與需求權威競爭。任何 skill 只要 fetch 了 spec.md 就會看到它。
 
-需求層級的內容改動由 `to-change-request` 負責（開發中途的再入點：grill 之後同步兩份文件並追加 ticket）。它是 `spec.md` 的合法修訂者，但也只做受影響段落的 delta 編輯，不重寫整份。
+需求層級的內容改動由 `to-change-request` 負責（開發中途的再入點：grill 之後同步兩份文件並修訂未完成的 ticket，新票交給 `to-tickets`）。它是 `spec.md` 的合法修訂者，但也只做受影響段落的 delta 編輯，不重寫整份。
 
 ### 2. 呼叫時明講兩個路徑（必做）
 

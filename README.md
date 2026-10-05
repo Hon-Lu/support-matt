@@ -1,6 +1,6 @@
 # support-matt
 
-套件版本：`v0.21.0`
+套件版本：`v0.22.0`
 更新時間：2026-10-05
 安裝教程：[INSTALL.md](./INSTALL.md)
 <!-- 版本對齊 plugins/support-matt/.claude-plugin/plugin.json 與 .codex-plugin/plugin.json，發版時三處版本與此處日期一併更新 -->
@@ -26,7 +26,7 @@
 | `engineering-spec-deliverable` | 把工作版 `engineering-spec.md` 轉成可獨立閱讀、可直接貼上公司 GitLab Issue 的交付版。 |
 | `implement-stepwise` | 取代 `implement`（**即時插手**）：單一 session 做完整張票，形狀貼近原生，但開場先評估規模、每個 commit 送出前停下附完整 commit message 與變更清單等你過目，回「繼續」才提交並接著做下一個；沒有更多 commit 時收尾開始前再停一次預告；收尾（測試 + 逐條核對驗收條件 + 寫回 ticket）做完即結束，**不自動跑 `code-review`**，只在 ticket 有硬約束可對照、實作偏離計畫或動到高風險區域時建議一行。不預先產 commit checklist。 |
 | `to-acceptance-map` | branch 開發完畢後於**獨立 session** 盤點測試覆蓋，產出 `acceptance-map.md`。驗證基準只認規格文件的 `VC-xx`，不拿 ticket 充數。四級判定區分「需補測試」與「不適用測試」，另檢出可能已失效的測試與潛在重複覆蓋（只偵測、不動測試）。回報只呈現例外，全程唯讀。 |
-| `to-change-request` | 開發中途改動的**再入點**：grill 完接這一支，一次做完 `spec.md` delta、規格文件修訂（委派給該 feature 實際用的 `to-issue-doc` 或 `to-engineering-spec`）與追加 ticket，一個確認關卡。純實作的改動直接請你去 implement，不動文件。 |
+| `to-change-request` | 開發中途改動的**再入點**：grill 完接這一支，一次做完 `spec.md` delta、規格文件修訂（委派給該 feature 實際用的 `to-issue-doc` 或 `to-engineering-spec`）與未完成 ticket 的修訂，一個確認關卡；每份產物改或不改都附理由。需要新票時給出插入票號（如 `04a`）交給 `to-tickets`，已完成的票不動。純實作的改動直接請你去 implement，不動文件。 |
 
 掛載位置：
 

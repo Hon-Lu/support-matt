@@ -71,7 +71,7 @@ grill-with-docs → to-spec → [to-issue-doc brief] → to-tickets → implemen
 | --- | --- | --- |
 | **brief** | `issue-doc.md` 不存在 | 一頁 brief，頂部 `文件狀態: brief (YYYY-MM-DD)` |
 | **修訂** | 文件存在且狀態為 `brief`，開發尚未結束 | 就地改，追加修訂紀錄 |
-| **final** | 全部 ticket 完成（`to-change-request` 沒有待處理的追加票） | 校準 VC + 依既成事實補齊，狀態改為 `final (YYYY-MM-DD)` |
+| **final** | 全部 ticket 完成（含 `to-change-request` 之後插入的新票） | 校準 VC + 依既成事實補齊，狀態改為 `final (YYYY-MM-DD)` |
 
 狀態已是 `final` 又被調用時，停下來確認：這是同一條 branch 的續作（確認後退回 `brief` 再修訂），還是該開新的 feature？**不要在 final 文件上靜默續改。**
 
@@ -228,6 +228,7 @@ $to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-sl
 
 - **就地改**受影響的章節與 `VC-xx`：新增給新編號，改寫就地改，取消的**保留該列並標記「已取消（YYYY-MM-DD，原因）」**——編號不回收，否則追溯鍵會對不上先前貼出去的內容。
 - 在文件末尾的「修訂紀錄」追加一列：日期、改了什麼、連帶改了 `spec.md` 的哪一段（若有）。
+- **判斷不需修改時，回報理由，不得只說「不需修改」。** 最常見的合理情況是改動只影響 final 才補的紀錄內容（資料模型、介面、實作落點），brief 的約束不受影響——這時要點名是哪一類內容、為什麼不在 brief。
 - 需求層級的改動（要不要做、做到什麼程度）**不在本 skill 處理**，`spec.md` 的權威不容繞過——請使用者走 `to-change-request`。
 - 已完成的 ticket 一律不回頭修改。被推翻的行為靠新票收掉，現行事實靠本文件的 `VC-xx` 記錄。
 
@@ -357,5 +358,5 @@ final 完成的文件會被整份貼進 GitLab，因此：
 ## 下一步引導（純提示，不主動調用）
 
 - **brief 完成** → 提示把 brief 貼上主 Issue 佔位，接著執行 `to-tickets` 拆票（那一行指令見「brief 模式」）。
-- **修訂完成** → 回到 `to-change-request` 追加 ticket，或直接 `implement`。
+- **修訂完成** → 回到 `to-change-request` 修訂 ticket（需要新票時由它給票號交給 `to-tickets`），或直接 `implement`。
 - **final 完成** → 提示執行 `to-acceptance-map`，兩份檔案一起貼上主 Issue。

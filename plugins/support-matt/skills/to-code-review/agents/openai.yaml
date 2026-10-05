@@ -1,5 +1,0 @@
-interface:
-  display_name: "To Code Review"
-  short_description: "code-review 的上層入口，自動取用 feature 目錄的規格"
-policy:
-  allow_implicit_invocation: false

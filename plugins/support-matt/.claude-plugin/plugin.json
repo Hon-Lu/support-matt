@@ -1,6 +1,6 @@
 {
   "name": "support-matt",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "掛在 Matt Pocock 工作流上的補強 skill 集：沿用 Matt 的流程骨架，補上公司實務需要、但 Matt 流程未涵蓋的環節。",
   "author": {
     "name": "Hon.Lu"

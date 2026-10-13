@@ -372,4 +372,4 @@ description: 整條 branch 開發完畢、規格文件收斂完成後（`issue-d
 - **接手的一律是 implement，不是 `to-change-request`。** 補測試與測試收斂都不改行為、不改設計決策、不改驗證條件，屬於 `to-change-request` 分流表上的「純實作」——那支 skill 在這種情況會直接停手請使用者去 implement，跑它只是多繞一圈。
 - **有可能已失效的測試** → 交由使用者判斷刪、改或留，本 skill 不動它。
 - **有潛在重複覆蓋** → 提示這是選用的 branch 層 cleanup（依 `testing-rules.md` 的「branch 層 cleanup 是例外」）。**只刪或併測試、不動 production code 時，不必為它跑任何 skill**，直接改即可；同時要動 production code、或範圍大到需要逐步把關時，才回 `implement-stepwise`（刪測試需要 commit 關卡讓人看一眼）；**動了測試就必須重跑受影響的測試專案並重跑本 skill**，確認沒有驗證條件因此失去覆蓋。不動也是合理選項。
-- **全部收斂** → 提示使用者可回 `to-issue-doc` 以修訂模式，依本檔案逐條補上驗證條件的「驗證結果」欄，再與本檔案一起貼上主 Issue。（重案流程改回 `to-engineering-spec` 修訂，並以 `engineering-spec-deliverable` 產交付版。）
+- **全部收斂** → 提示使用者把 `issue-doc.md` 貼為主 Issue 的本文，本檔案與各票貼在它的留言；`issue-doc.md` 不加「驗證結果」欄。（重案流程改回 `to-engineering-spec` 修訂補上「驗證結果」欄，並以 `engineering-spec-deliverable` 產交付版。）

@@ -1,7 +1,7 @@
 # support-matt
 
-套件版本：`v0.26.0`
-更新時間：2026-10-13
+套件版本：`v0.27.0`
+更新時間：2026-10-14
 安裝教程：[INSTALL.md](./INSTALL.md)
 <!-- 版本對齊 plugins/support-matt/.claude-plugin/plugin.json 與 .codex-plugin/plugin.json，發版時三處版本與此處日期一併更新 -->
 
@@ -21,7 +21,7 @@
 | Skill | 用途 |
 | --- | --- |
 | `setup-matt-preset` | 以個人慣例初始化 Matt skills 的 per-repo 設定：local issue tracker（GitLab 只讀不寫）、產物一律放 `.ai/`、`CLAUDE.md` 改以 `@` 匯入。取代直接調用 `setup-matt-pocock-skills`。 |
-| `to-issue-doc` | 貼上主 Issue 的 `issue-doc.md`，**分兩個時點寫**：拆票前的 brief 只寫「約束」——目標與範圍、方案輪廓、關鍵決策、驗證條件 `VC-xx`、風險（不先定版，這些決策會發生在拆票裡而沒有紀錄），只有 VC 那張表要逐條確認——VC 只定義「要證明什麼」的結果，怎麼證明交給測試，不列舉等價類、不寫驗證手段；系統分析、資料模型、介面與流程屬於「紀錄」，留到 branch 做完跑 `final`，依 `to-engineering-spec` 的文件模板與章節存在門檻，由既成事實（程式碼、ticket 核對表、`git diff`）重新組裝成同等完整的 SA/SD：章節依情況去留、內容不壓縮，需求內嵌、不留任何開發流程的痕跡（`spec.md`、ADR、User Story），並補查既有資料影響、上線注意事項、範圍外仍走舊邏輯的路徑與未自動化驗證的行為，寫成給審查者與接手工程師讀的文件，可直接貼上主 Issue。開發中途就地修訂。 |
+| `to-issue-doc` | 貼上主 Issue 的 `issue-doc.md`，**分兩個時點寫**：拆票前的 brief 只寫「約束」——目標與範圍、方案輪廓、關鍵決策、驗證條件 `VC-xx`、風險（不先定版，這些決策會發生在拆票裡而沒有紀錄），只有 VC 那張表要逐條確認——VC 只定義「要證明什麼」的結果，怎麼證明交給測試，不列舉等價類、不寫驗證手段；系統分析、資料模型、介面與流程屬於「紀錄」，留到 branch 做完跑 `final`，由既成事實（程式碼、ticket 核對表、`git diff`）重新組裝成以功能為主軸、偏 SA 帶必要 SD 的文件：每個功能一章，集中寫行為、業務規則與例外、必須遵守的設計約束，實作選擇留給貼在留言的票；驗證條件獨立一章，跨功能的上線與資料轉換另立一章，需求內嵌、不留任何開發流程的痕跡（`spec.md`、ADR、User Story），並補查既有資料影響、上線注意事項、範圍外仍走舊邏輯的路徑與未自動化驗證的行為，寫成給審查者與接手工程師讀的文件，可直接貼上主 Issue。開發中途就地修訂。 |
 | `to-engineering-spec` | 同一種文件，但**動工前一次寫到位**：系統分析、技術設計、實作約束都在拆票前定版、經審查後才動手。差別不在誰的規則比較嚴，而在設計要不要先成為「被遵守的約束」——動角色權限、動 schema 牽動交易邊界、改變既有架構假設，或公司要求動工前提交完整設計時，事後補寫就來不及了。 |
 | `engineering-spec-deliverable` | 把工作版 `engineering-spec.md` 轉成可獨立閱讀、可直接貼上公司 GitLab Issue 的交付版。 |
 | `implement-stepwise` | 取代 `implement`（**即時插手**）：單一 session 做完整張票，形狀貼近原生，但開場先評估規模、每個 commit 送出前停下附完整 commit message 與變更清單等你過目，回「繼續」才提交並接著做下一個；最後一個 commit 提交後直接跑驗證（測試 + 跨層重複檢查 + 逐條判定驗收條件），做完停在定稿前停點給你看結果；**不自動跑 `code-review`**，只在 ticket 有硬約束可對照、實作偏離計畫或動到高風險區域時於停點建議，你要求才執行；最後才把核對結果寫回 ticket。不預先產 commit checklist。 |

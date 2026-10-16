@@ -83,7 +83,7 @@ commit 前的 consolidation 有個看不到的死角：**同一個行為的單�
 | 4 | 部分達成 | 下拉已實作，缺「退貨單」選項 |
 
 **冷眼審查**
-建議跑 `/code-review a1b2c3d .ai/issues/0042-xxx/03-yyy.md`：命中 A（本票實作 BR-03 的實作約束）、C（新增刪除端點）。
+建議跑 `/mattpocock-skills:code-review a1b2c3d .ai/issues/0042-xxx/03-yyy.md`：命中 A（本票實作 BR-03 的實作約束）、C（新增刪除端點）。
 
 回「繼續」我會把核對結果寫回 ticket 並結束；回「審查」我會執行上面的審查。
 要補做或修正什麼，現在講。
@@ -112,6 +112,7 @@ commit 前的 consolidation 有個看不到的死角：**同一個行為的單�
 建議的規則：
 
 - **指令寫成可直接複製執行的一整行**，並寫出命中哪幾條與具體依據。
+- **skill 寫完整名稱 `/mattpocock-skills:code-review`。** 環境裡常有其他同名的 `code-review`（例如 Claude Code 內建的），只寫短名，執行端（包括轉交給其他 agent 時）分不出要叫哪一個。
 - **fixed point 用本票第一個 commit 的 parent SHA**，審查範圍才會只限本票；沒給的話 `/code-review` 會反問，隨手回 `main` 就變成審整條 branch。
 - **規格來源直接帶本票 ticket 的路徑。** 不帶的話 `/code-review` 會自己找規格，在 local markdown tracker 下很容易抓到整份 `spec.md` 或 `issue-doc.md`，把別張票的需求報成缺漏。
 - **一條都沒命中就整段不提**，不要寫「本票不需審查」。

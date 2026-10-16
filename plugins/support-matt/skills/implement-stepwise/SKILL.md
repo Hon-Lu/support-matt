@@ -50,7 +50,11 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 
 1. `.ai/docs/agents/issue-tracker.md` — ticket 檔案的位置與慣例。找不到時改讀 `docs/agents/issue-tracker.md`；兩者皆無則停下來請使用者先執行 `setup-matt-preset`。
 2. `.ai/docs/agents/domain.md` — `CONTEXT.md` 與 ADR 的位置。依它指出的路徑讀取；檔案不存在時**靜默略過**。
-3. 目標 ticket 檔案本身。
+3. `.ai/docs/agents/testing.md` — 本 repo 的測試情境，由 `setup-matt-preset` 與使用者討論後寫出。檔案不存在時**靜默略過**，一切照本 skill 與 references 的字面執行。存在時：
+   - 本 skill 與 references 以「測試專案」表達的**受影響範圍**（逐 commit 驗證、收尾驗證、跨層刪併後重跑），一律改讀為它定義的執行單位與受影響範圍，指令照它寫的跑。
+   - 「動到共用測試基礎設施時整個測試專案跑完」那條**不改讀**——那條要的就是全跑；它寫了全跑耗時或要求全跑前先問時，停下來問使用者，不自行全跑。
+   - 它寫了哪些測試會寫外部狀態時，第 3 節的分流照它判定，不再自行推斷。
+4. 目標 ticket 檔案本身。
 
 **不要主動去讀 `spec.md` / `engineering-spec.md` / `issue-doc.md`。** ticket 應當自足；真的缺資訊時才回頭撈相關章節，並在回報中指出 ticket 哪裡不足。專案設定檔要求實作前先讀這些文件時，以本規則為準。這幾份合計可達 50KB 以上，而本 skill 一路不清 context——讀進來就會跟著每一個回合重送到結束。
 

@@ -1,6 +1,6 @@
 # support-matt
 
-套件版本：`v0.29.0`
+套件版本：`v0.30.0`
 更新時間：2026-10-14
 安裝教程：[INSTALL.md](./INSTALL.md)
 <!-- 版本對齊 plugins/support-matt/.claude-plugin/plugin.json 與 .codex-plugin/plugin.json，發版時三處版本與此處日期一併更新 -->
@@ -20,7 +20,7 @@
 
 | Skill | 用途 |
 | --- | --- |
-| `setup-matt-preset` | 以個人慣例初始化 Matt skills 的 per-repo 設定：local issue tracker（GitLab 只讀不寫）、產物一律放 `.ai/`、`CLAUDE.md` 改以 `@` 匯入。取代直接調用 `setup-matt-pocock-skills`。 |
+| `setup-matt-preset` | 以個人慣例初始化 Matt skills 的 per-repo 設定：local issue tracker（GitLab 只讀不寫）、產物一律放 `.ai/`、`CLAUDE.md` 改以 `@` 匯入；另確認測試情境，預設「以測試專案為單位」跑測試不合用時（例如單一專案混放單元與整合測試）與你討論後寫出 `.ai/docs/agents/testing.md`，`implement-stepwise` 與 `to-acceptance-map` 會改用該 repo 的執行單位。取代直接調用 `setup-matt-pocock-skills`。 |
 | `to-issue-doc` | 貼上主 Issue 的 `issue-doc.md`，**分兩個時點寫**：拆票前的 brief 只寫「約束」——目標與範圍、方案輪廓、關鍵決策、驗證條件 `VC-xx`、風險（不先定版，這些決策會發生在拆票裡而沒有紀錄），只有 VC 那張表要逐條確認——VC 只定義「要證明什麼」的結果，怎麼證明交給測試，不列舉等價類、不寫驗證手段；系統分析、資料模型、介面與流程屬於「紀錄」，留到 branch 做完跑 `final`，由既成事實（程式碼、ticket 核對表、`git diff`）重新組裝成以功能為主軸、偏 SA 帶必要 SD 的文件：每個功能一章，集中寫行為、業務規則與例外、必須遵守的設計約束，實作選擇留給貼在留言的票；驗證條件獨立一章，跨功能的上線與資料轉換另立一章，需求內嵌、不留任何開發流程的痕跡（`spec.md`、ADR、User Story），並補查既有資料影響、上線注意事項、範圍外仍走舊邏輯的路徑與未自動化驗證的行為，寫成給審查者與接手工程師讀的文件，可直接貼上主 Issue。開發中途就地修訂。 |
 | `to-engineering-spec` | 同一種文件，但**動工前一次寫到位**：系統分析、技術設計、實作約束都在拆票前定版、經審查後才動手。差別不在誰的規則比較嚴，而在設計要不要先成為「被遵守的約束」——動角色權限、動 schema 牽動交易邊界、改變既有架構假設，或公司要求動工前提交完整設計時，事後補寫就來不及了。 |
 | `engineering-spec-deliverable` | 把工作版 `engineering-spec.md` 轉成可獨立閱讀、可直接貼上公司 GitLab Issue 的交付版。 |

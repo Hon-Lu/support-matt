@@ -1,6 +1,6 @@
 ---
 name: implement-stepwise
-description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原生的 implement：開場先評估 ticket 規模、過重時建議回 to-tickets 拆小，動手前一次確認全部 seam，TDD，每個 commit 送出之前停下來，附上完整的 commit message 與變更清單等使用者過目，使用者回「繼續」才由本 skill 執行 git commit 並接著做下一個 commit，直到下一個 commit 前再停；最後一個 commit 提交後告知使用者並直接跑驗證（受影響範圍測試、跨層重複檢查、逐條判定驗收條件），做完停在定稿前停點攤出結果，命中條件時附上 code-review 建議，使用者明確要求才執行審查，最後才把核對結果寫回 ticket。不預先產出 commit checklist，也不把切分寫回 ticket——使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。適合邊界明確、預估 commit 五個以內的 ticket。當使用者要在單一 session 內做完一張小票、但希望每個 commit 送出前都能看一眼、必要時即時調整時使用。
+description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原生的 implement：開場先評估 ticket 規模、過重時建議回 to-tickets 拆小，動手前一次確認全部 seam，TDD，每個 commit 送出之前停下來，附上完整的 commit message 與變更清單等使用者過目，使用者回「繼續」才由本 skill 執行 git commit 並接著做下一個 commit，直到下一個 commit 前再停；最後一個 commit 提交後告知使用者並直接跑驗證（受影響範圍測試、跨層重複檢查、逐條判定驗收條件），做完停在定稿前停點攤出結果，命中條件時附上 code-review 建議，使用者明確要求才執行審查，最後把本票的 commit 壓成一個票級 commit、再把核對結果寫回 ticket。不預先產出 commit checklist，也不把切分寫回 ticket——使用者不需要提前知道每個 commit 要幹嘛，只需要在送出前有機會插手。適合邊界明確、預估 commit 五個以內的 ticket。當使用者要在單一 session 內做完一張小票、但希望每個 commit 送出前都能看一眼、必要時即時調整時使用。
 ---
 
 # implement-stepwise
@@ -188,9 +188,9 @@ feat: 新增 X 的查詢路徑
 
 ### 定稿前停點（不得跳過）
 
-驗證做完，依 `wrap-up-rules.md` 的「定稿前停點」回報測試結果、跨層重複檢查結論、驗收判定表，命中條件時附上冷眼審查的建議指令，然後等使用者回應：
+驗證做完，依 `wrap-up-rules.md` 的「定稿前停點」回報測試結果、跨層重複檢查結論、驗收判定表、commit 壓縮的分組與訊息，命中條件時附上冷眼審查的建議指令，然後等使用者回應：
 
-- **「繼續」** → 進定稿。
+- **「繼續」** → 進定稿（含照列出的內容壓縮 commit）。
 - **補做或修正** → 走第 4 節的關卡提交，回到驗證整段重跑，再停一次。
 - **「審查」或主動要求審查** → 依 `wrap-up-rules.md` 的「冷眼審查」執行，逐項請使用者決定採納與否；採納要修的走第 4 節的關卡，全部提交後回到驗證整段重跑，再停一次。
 
@@ -198,11 +198,11 @@ feat: 新增 X 的查詢路徑
 
 ### 定稿
 
-依 `wrap-up-rules.md` 的「定稿」執行——**把核對結果寫回 ticket**（勾選達成項 + append 帶證據的核對表），回報。
+依 `wrap-up-rules.md` 的「定稿」執行——**先把本票的 commit 壓成票級 commit**，再**把核對結果寫回 ticket**（勾選達成項 + append 帶證據的核對表），回報。壓縮會讓原本各 commit 的 hash 失效，所以排在寫回之前，之後引用一律用壓縮後的 hash。
 
 **寫回 ticket 對本 skill 特別重要。** 本 skill 不在 ticket 留下 Commit checklist，若核對結果也只留在對話裡，這張票在檔案上就完全沒有交付紀錄。因此在核對表的「依據」欄一併帶入各 commit 的測試名稱（邊做邊記的內容），讓 ticket 自己說得出這張票交付了什麼、由什麼證明；本票有做 Test Consolidation 時，也依「寫回 ticket」在表格後補一行摘要——關卡上講過的刪／併只留在對話裡，ticket 上會看不出測試為什麼變少；有跑冷眼審查時，再補一行審查紀錄。
 
-回報時一併列出全部 commit 清單（含各自的 commit message）。
+回報時一併列出壓縮後的 commit 清單（含各自的 commit message 與 hash）。
 
 **回報完就停。** 不追問下一步，也不再提審查。
 
@@ -217,7 +217,7 @@ feat: 新增 X 的查詢路徑
 
 ticket 的驗收條件有誤時，建議使用者回到 `to-tickets` 修正，不要自行改寫 ticket。
 
-**已提交的 commit 不回頭改。** 使用者在後面的關卡才發現前一個 commit 有問題時，建議以新的 commit 修正（同樣走第 4 節的關卡），不要 amend 或 reset——除非使用者明確要求。
+**已提交的 commit 不回頭改。** 使用者在後面的關卡才發現前一個 commit 有問題時，建議以新的 commit 修正（同樣走第 4 節的關卡），不要 amend 或 reset——除非使用者明確要求。定稿的 commit 壓縮是唯一的例外，它在停點經過使用者同意。
 
 ## 下一步引導（純提示，不主動調用）
 

@@ -10,7 +10,7 @@
 
 1. **驗證** —— 跑受影響範圍的測試、跨層重複檢查、逐條判定驗收條件。一路做完不停，判定結果**只留在對話**。
 2. **定稿前停點** —— 攤出驗證結果，命中條件時附上冷眼審查的建議，等使用者決定。這是收尾唯一的停頓。
-3. **定稿** —— 把核對結果寫回 ticket、回報，結束。
+3. **定稿** —— 把本票的 commit 壓成票級 commit、把核對結果寫回 ticket、回報，結束。
 
 **ticket 只在定稿時寫一次。** 驗證結果不先寫回有兩個理由：冷眼審查讀到的 ticket 只有驗收條件原文，不會被同一個 session 的自評（一排 `[x]` 與「達成」依據）帶著走；停點之後的任何修正都發生在寫回之前，寫進 ticket 的永遠是最終狀態。
 
@@ -82,10 +82,21 @@ commit 前的 consolidation 有個看不到的死角：**同一個行為的單�
 | 1 | 達成 | … |
 | 4 | 部分達成 | 下拉已實作，缺「退貨單」選項 |
 
+**commit 壓縮**
+本票 4 個 commit 壓成 1 個：
+```text
+<type>: #<issue> <這張票交付了什麼>
+
+- <commit 1 的標題，去掉 type 前綴>
+- <commit 2 的標題，去掉 type 前綴>
+- <commit 4 的標題，去掉 type 前綴>
+```
+`<hash> <type>: <與本票目的無關的那個 commit>` 不屬於本票，維持獨立。
+
 **冷眼審查**
 建議跑 `/mattpocock-skills:code-review a1b2c3d .ai/issues/0042-xxx/03-yyy.md`：命中 A（本票實作 BR-03 的實作約束）、C（新增刪除端點）。
 
-回「繼續」我會把核對結果寫回 ticket 並結束；回「審查」我會執行上面的審查。
+回「繼續」我會照上面壓縮 commit、把核對結果寫回 ticket 並結束；回「審查」我會執行上面的審查。
 要補做或修正什麼，現在講。
 ````
 
@@ -130,8 +141,40 @@ commit 前的 consolidation 有個看不到的死角：**同一個行為的單�
 
 使用者在停點回「繼續」後一路做完，不再停：
 
-1. **把核對結果寫回 ticket** —— 見下方「寫回 ticket」。
-2. **回報** commit 清單（含各自的 commit message，包含跨層收斂與停點之後的修正 commit），以及寫回 ticket 的結果。
+1. **壓縮本票的 commit** —— 見下方「壓縮本票 commit」。
+2. **把核對結果寫回 ticket** —— 見下方「寫回 ticket」。
+3. **回報**壓縮後的 commit 清單（含各自的 commit message 與 hash）、壓縮前的 HEAD，以及寫回 ticket 的結果。
+
+### 壓縮本票 commit
+
+逐 commit 是為了讓使用者逐一過目；審完之後，branch 上留一張票一個 commit 就夠了。這樣 MR 不必把整條 branch squash 成一行而丟掉細節，細節改由票級 commit 的條列保留。
+
+**分組**
+
+- **預設把本票全部 commit 壓成一個**，包含跨層收斂的 `test:` commit 與停點之後的修正 commit。
+- 開發中混進、不屬於本票目的的 commit（例如順手修了別處的問題）**維持獨立**，不併進票級 commit。這種情況少見；判斷依據是它能不能寫進本票的條列而不顯得突兀。
+- 分組與訊息在停點列出（見「定稿前停點」的範本）；使用者改了分組或訊息就照改後的做，說不壓就跳過這一步。**停點的「繼續」即同意照列出的內容壓縮**，不另外再問。
+- 本票只有一個 commit 時，這一步不做，停點也不列。
+
+**訊息格式**
+
+```text
+<type>: #<issue> <這張票交付了什麼>
+
+- <原 commit 的標題，去掉 type 前綴>
+- <原 commit 的標題，去掉 type 前綴>
+```
+
+- 條列直接用原 commit 的標題、依原本的順序，不另外改寫——要保留的正是這些原本會在 squash 時消失的內容。
+- `<type>` 取本票的主要性質，格式與 issue 編號依 `implementation-rules.md` 的 Commit 規範。
+
+**執行**
+
+- **前提**：本票的 commit 都還沒 push、工作區乾淨。有任何一個已經 push 就不壓，在停點說明原因。
+- 先記下目前的 HEAD，再 `git reset --soft <本票第一個 commit 的 parent>` 後重新 commit。維持獨立的 commit 夾在中間時需要重排，改用非互動式 rebase；有衝突就 `git rebase --abort`，維持原樣並回報。**不得使用 `git reset --hard`。**
+- 壓完用 `git diff <壓縮前的 HEAD> HEAD` 確認內容沒有變化，輸出必須為空；不為空就停下回報，不要自己修。
+
+**hash 一律用壓縮後的。** 壓縮後原本各 commit 的 hash 不再存在於 branch 上，所以壓縮排在寫回 ticket 之前：寫回 ticket、回報，以及之後任何文件引用本票的 commit，都用壓縮後的 hash。冷眼審查的 fixed point 是本票第一個 commit 的 parent，壓縮不影響它。
 
 ### 寫回 ticket
 

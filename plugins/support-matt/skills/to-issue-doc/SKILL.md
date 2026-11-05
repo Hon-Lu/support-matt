@@ -84,11 +84,11 @@ grill-with-docs → to-spec → [to-issue-doc brief] → to-tickets → implemen
 ## 前置讀取
 
 1. `.ai/docs/agents/issue-tracker.md`（找不到改讀 `docs/agents/issue-tracker.md`）—— 檔案位置與慣例。兩者皆無則請使用者先跑 `setup-matt-preset`。
-2. `.ai/docs/agents/domain.md` 指出的 `CONTEXT.md` 與 ADR —— 命名與既有決策的依據；檔案不存在時**靜默略過**。
+2. `.ai/docs/agents/domain.md` 指出的專案詞彙表（`GLOSSARY.md`，舊 repo 為 `CONTEXT.md`）與 ADR —— 命名與既有決策的依據；檔案不存在時**靜默略過**。
 3. `spec.md` —— 需求權威。**brief 與 final 模式必讀**：final 要把需求內嵌進各功能章的行為與業務規則。
 4. `issues/` 下的 ticket（含驗收核對表）—— **final 模式必讀**；brief 模式時尚未拆票，不存在。
 
-命名一律使用 `CONTEXT.md` 的領域詞彙；與既有 ADR 抵觸時明確指出，不默默覆蓋。
+命名一律使用專案詞彙表的領域詞彙；與既有 ADR 抵觸時明確指出，不默默覆蓋。
 
 ## brief 模式
 
@@ -127,7 +127,7 @@ grill-with-docs → to-spec → [to-issue-doc brief] → to-tickets → implemen
 寫完後把整份攤給使用者，**只針對 `VC-xx` 那張表請他逐條確認**；其餘章節請他掃一眼有無明顯錯誤。確認完成即停止，並在回報中給出可直接貼的下一步：
 
 ```text
-$to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-slug>/issue-doc.md 拆票，並參照 .ai/docs/adr/ 與 .ai/CONTEXT.md
+$to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-slug>/issue-doc.md 拆票，並參照 .ai/docs/adr/ 與專案詞彙表
 ```
 
 **`方案輪廓` 與 `關鍵決策` 就是拆票的輸入**，因此那一行要帶上本文件；`$to-tickets ...` 只出現在回報訊息，不寫進文件。
@@ -291,7 +291,7 @@ final 的產出是主 Issue 的本文：**由既成事實重新組裝，不是�
   - **線性流程用文字**，畫成圖只是把一句話拉成十行。
   圖放在它說明的那一段旁邊：判斷流程放在該 `BR-xx` 的「判定」，參與者的交互放在該功能的「設計」。
 - **沒有內容的格子、區塊、列不留。** 說明欄填「—」的列、只寫「見某章」的區塊、只有一個可能值的欄位，都刪掉。「附錄：修訂紀錄」的里程碑列例外。
-- **不留開發流程的痕跡。** 開發中使用的工作流程用語與產物，其他人看不懂也用不到：`spec.md`、User Story、ADR、`CONTEXT.md`、brief、切片、seam、skill 名稱都不出現。需要的內容改寫成讀者看得懂的敘述攤回內文。票編號例外，因為票會貼在 Issue 留言。
+- **不留開發流程的痕跡。** 開發中使用的工作流程用語與產物，其他人看不懂也用不到：`spec.md`、User Story、ADR、`GLOSSARY.md`、`CONTEXT.md`、brief、切片、seam、skill 名稱都不出現。需要的內容改寫成讀者看得懂的敘述攤回內文。票編號例外，因為票會貼在 Issue 留言。
 
 ### 1. 校準 `VC-xx`（先做這件事）
 
@@ -459,7 +459,7 @@ final 會被整份貼進 GitLab，作為主 Issue 的本文；拆票的 issue �
 
 **自足**
 - 沒有 `spec.md` 的痕跡：連結、User Story 編號、「詳見需求文件」都沒有出現。
-- 沒有開發流程用語：ADR、`CONTEXT.md`、brief、切片、seam、skill 名稱都沒有出現。
+- 沒有開發流程用語：ADR、`GLOSSARY.md`、`CONTEXT.md`、brief、切片、seam、skill 名稱都沒有出現。
 - 不留本地相對連結（`./spec.md`、`./issues/xx.md`）、`.scratch/` 路徑、`$to-tickets ...` 之類的指令行、TODO 與內部工作註記。
 
 **正確**
@@ -516,7 +516,7 @@ final 會被整份貼進 GitLab，作為主 Issue 的本文；拆票的 issue �
 | 難以回復、影響超出本 feature 的決策理由 | ADR（`.ai/docs/adr/`） |
 | 工作切片、逐票 commit 與驗收明細 | `issues/` 下的 ticket —— 不是需求或驗證的權威，也不需要摘進本文件 |
 | 測試對 `VC-xx` 的覆蓋情形 | `acceptance-map.md`（`to-acceptance-map`） |
-| 專案術語 | `.ai/CONTEXT.md` |
+| 專案術語 | 專案詞彙表（`.ai/docs/agents/domain.md` 指出的檔案） |
 
 - **`to-tickets`** 讀 `spec.md` 與本文件的 brief 拆票（`方案輪廓`、`關鍵決策` 是切分的輸入）；本 skill 不自己拆、不調用它、不改 `issues/`。拆票過程若發現 brief 的方案輪廓站不住，回本 skill 修訂模式，不要在票裡默默改設計。
 - **`to-acceptance-map`** 讀本文件的 `VC-xx`；本 skill 不做覆蓋盤點，也不把測試結果寫進本文件。

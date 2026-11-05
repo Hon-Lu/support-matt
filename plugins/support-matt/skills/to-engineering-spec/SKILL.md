@@ -5,7 +5,7 @@ description: 在 Matt 的 to-spec 與 to-tickets 之間，建立並維護一份�
 
 # to-engineering-spec
 
-從 Matt 最新版 Spec、程式碼現況、`.ai/CONTEXT.md` 與 ADR 出發，建立或維護**一份** `engineering-spec.md`——公司正式的開發規格文件。繁體中文，同時涵蓋系統分析與系統設計，但不切成「SA」「SD」兩大章。
+從 Matt 最新版 Spec、程式碼現況、專案詞彙表（`.ai/docs/agents/domain.md` 指出的檔案）與 ADR 出發，建立或維護**一份** `engineering-spec.md`——公司正式的開發規格文件。繁體中文，同時涵蓋系統分析與系統設計，但不切成「SA」「SD」兩大章。
 
 三種讀者：**審查的人**（可直接人工審查，交付版貼回公司 GitLab Issue）、**實作的工程師**（細節完整到不必回頭問人）、**下游 Matt Agent**（`to-tickets` 依它切 slices，`implement` 依它落地，`code-review` 依它判斷偏離）。
 
@@ -142,7 +142,7 @@ Matt 的 Spec 模板允許放 API contracts 與 technical clarifications，裡�
 | 系統分析、設計決策、實作約束 | **本文件**（`engineering-spec.md`） |
 | 驗證條件——**怎麼驗證需求成立** | **本文件**的「驗證條件」章，每條指回 user story、BR 或本文件的設計章節 |
 | 少量、重要、難以回復且有真實取捨的決策理由 | **ADR**（`.ai/docs/adr/`） |
-| 專案術語 | **`.ai/CONTEXT.md`** |
+| 專案術語 | **專案詞彙表** |
 | 工作切片 | **Tickets**（`.ai/.scratch/<feature-slug>/issues/`）——不是需求或架構的權威 |
 | 實際落地證據 | **程式碼與測試**——不自動凌駕已確認規格 |
 | 正式的人類紀錄 | **公司 GitLab Issue**——可貼入最終規格，不作為 Agent 的工作佇列 |
@@ -153,7 +153,7 @@ Matt 的 Spec 模板允許放 API contracts 與 technical clarifications，裡�
 
 至少需要下列其一：Matt Spec 的路徑（通常 `.ai/.scratch/<feature-slug>/spec.md`）或內容、當前對話（剛跑完 `grill-with-docs` / `to-spec` 的脈絡）、待修訂或待定稿的現有 `engineering-spec.md`。
 
-會主動讀取（存在時）：現有程式碼、`.ai/CONTEXT.md` / `.ai/CONTEXT-MAP.md`、`.ai/docs/adr/`、`.ai/.scratch/<feature-slug>/issues/`。
+會主動讀取（存在時）：現有程式碼、專案詞彙表、`.ai/docs/adr/`、`.ai/.scratch/<feature-slug>/issues/`。
 
 選填：公司 PRD 或 GitLab Issue 內容（可直接貼上，或提供 issue 編號由 `glab issue view` 取得，**只讀不寫**）、輸出路徑、語言覆蓋設定。
 
@@ -191,7 +191,7 @@ Matt 的 issue tracker 設定為 Local markdown 時，同一功能的產物集�
 
 **建立模式**
 
-1. 讀 Matt Spec 全文、當前對話、`.ai/CONTEXT.md`、相關 ADR；確認 `feature-slug` 與 issue tracker 設定。
+1. 讀 Matt Spec 全文、當前對話、專案詞彙表、相關 ADR；確認 `feature-slug` 與 issue tracker 設定。
 2. 依「適用門檻」判斷是否值得產出；三者以上皆否時停下來告知使用者。
 3. 既有專案：依 `references/codebase-discovery.md` 查找現況，查找與撰寫同時進行。
 4. 讀 `writing-rules.md`、`constraint-levels.md`、`document-template.md`。
@@ -262,7 +262,7 @@ Matt 的 issue tracker 設定為 Local markdown 時，同一功能的產物集�
 回報時給使用者可直接貼上的一行：
 
 ```text
-$to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-slug>/engineering-spec.md 拆票，並參照 docs/adr/ 與 CONTEXT.md
+$to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-slug>/engineering-spec.md 拆票，並參照 docs/adr/ 與專案詞彙表
 ```
 
 文件最後一章寫入固定的 handoff 段落，內容照抄 `references/document-template.md` 的「交給 to-tickets」，不要每次重寫措辭。

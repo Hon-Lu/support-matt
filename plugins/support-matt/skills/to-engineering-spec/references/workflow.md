@@ -42,9 +42,9 @@
 
 ### 分析段流程
 
-1. 讀 Matt Spec 全文（通常 `.ai/.scratch/<feature-slug>/spec.md`）、當前對話、`.ai/CONTEXT.md`、`.ai/docs/adr/` 中相關的 ADR。確認 `feature-slug` 與 `.ai/docs/agents/issue-tracker.md` 的 tracker 設定。
+1. 讀 Matt Spec 全文（通常 `.ai/.scratch/<feature-slug>/spec.md`）、當前對話、專案詞彙表、`.ai/docs/adr/` 中相關的 ADR。確認 `feature-slug` 與 `.ai/docs/agents/issue-tracker.md` 的 tracker 設定。
 2. 依 SKILL.md 的「適用門檻」判斷值不值得產出。三者以上皆否時停下來告知使用者可走 Matt 原生流程。
-3. 判斷既有專案 / 全新專案。既有專案讀 `codebase-discovery.md` 查找現況——**分析段也要查找**，因為現有的角色、狀態、規則與術語會直接改變分析的寫法。術語一律對齊 `.ai/CONTEXT.md`。
+3. 判斷既有專案 / 全新專案。既有專案讀 `codebase-discovery.md` 查找現況——**分析段也要查找**，因為現有的角色、狀態、規則與術語會直接改變分析的寫法。術語一律對齊專案詞彙表。
 4. 讀 `writing-rules.md`、`constraint-levels.md`、`document-template.md`，寫出分析段章節。
 5. 過程中出現疑問，依 `clarification-and-open-questions.md` 立即停下來問；被暫緩的問題全數進「待釐清事項」。已在 grilling 或 Matt Spec 確認的事不重問。
 6. **跑一次「送出前自檢」**（見下方共用的「送出前自檢」章節），發現的問題就地修掉。

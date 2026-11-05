@@ -10,7 +10,7 @@ grill-with-docs → to-spec → to-engineering-spec → 人工確認 → to-tick
 
 | 產物 | 誰產 | 是什麼的權威 | **不是**什麼的權威 |
 | --- | --- | --- | --- |
-| `.ai/CONTEXT.md` | `domain-modeling` | 專案術語 | 需求、設計 |
+| 專案詞彙表 | `domain-modeling` | 專案術語 | 需求、設計 |
 | `.ai/docs/adr/NNNN-*.md` | `domain-modeling` / `grill-with-docs` | 少量、重要、難以回復且有真實取捨的決策**理由** | 完整設計；ADR 不該長成規格 |
 | `.ai/.scratch/<slug>/spec.md` | `to-spec` 建立，`to-change-request` 修訂 | **需求、範圍、行為、user stories、測試決策** | 系統分析、資料表結構、交易邊界、可判斷真偽的驗證條件 |
 | `.ai/.scratch/<slug>/engineering-spec.md` | **本 skill** | **系統分析、設計決策、實作約束、驗證條件** | 需求要不要做、做到什麼程度 |
@@ -25,7 +25,7 @@ grill-with-docs → to-spec → to-engineering-spec → 人工確認 → to-tick
 1. **需求類事實**（要做什麼、誰用、什麼算完成）→ Matt Spec 勝。本文件跟著改。
 2. **設計類事實**（怎麼做、資料長怎樣、邊界在哪）→ 本文件勝。Matt Spec 不該寫這些；若它寫了且與本文件衝突，停下來請使用者決定要不要把那段從 Matt Spec 移除。
 3. **決策理由** → ADR 勝。本文件引用 ADR 編號，不複製理由全文。
-4. **術語** → `.ai/CONTEXT.md` 勝。兩份文件都必須用它的字。
+4. **術語** → 專案詞彙表優先。兩份文件都必須用它的字。
 5. **程式碼** → **不自動勝**。程式碼與規格不一致是一個要被決策的事實，不是一個自動生效的更新。
 
 **任何順位衝突都不由 skill 自行裁決**，一律停下來指出衝突並要求處理（見 SKILL.md 的「衝突處理」）。
@@ -99,7 +99,7 @@ Matt 的 `to-tickets` 只在使用者傳入 reference 時才會 fetch，`impleme
 回報訊息給出可直接貼上的一行：
 
 ```text
-$to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-slug>/engineering-spec.md 拆票，並參照 docs/adr/ 與 CONTEXT.md
+$to-tickets 依 .ai/.scratch/<feature-slug>/spec.md 與 .ai/.scratch/<feature-slug>/engineering-spec.md 拆票，並參照 docs/adr/ 與專案詞彙表
 ```
 
 `to-tickets` 的 step 1 明說會 fetch 使用者傳入的 reference，這是最直接有效的一道。

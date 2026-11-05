@@ -74,7 +74,7 @@ description: 開發中途發現需要改動時的再入點：接在討論或 gri
 - `spec.md` —— 需求權威，**必要**。
 - `engineering-spec.md` —— 設計與驗證條件的權威（可能不存在，見下方防呆）。
 - `issues/` 底下全部 ticket —— 取得編號、相依關係、哪些已完成（判準見「ticket 修訂規範」）。
-- `.ai/docs/adr/` 中相關的 ADR、`.ai/CONTEXT.md`（術語一律對齊它）。
+- `.ai/docs/adr/` 中相關的 ADR、`.ai/docs/agents/domain.md` 指出的專案詞彙表（術語一律對齊它）。
 
 **三種要先停下來的狀態：**
 

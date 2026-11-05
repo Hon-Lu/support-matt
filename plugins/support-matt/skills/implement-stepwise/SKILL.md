@@ -49,7 +49,7 @@ description: 在單一 session 內把一整張 ticket 做完，取代 Matt 原�
 不要硬編路徑，一律從設定檔取得：
 
 1. `.ai/docs/agents/issue-tracker.md` — ticket 檔案的位置與慣例。找不到時改讀 `docs/agents/issue-tracker.md`；兩者皆無則停下來請使用者先執行 `setup-matt-preset`。
-2. `.ai/docs/agents/domain.md` — `CONTEXT.md` 與 ADR 的位置。依它指出的路徑讀取；檔案不存在時**靜默略過**。
+2. `.ai/docs/agents/domain.md` — 專案詞彙表（`GLOSSARY.md`，舊 repo 為 `CONTEXT.md`）與 ADR 的位置。依它指出的路徑讀取；檔案不存在時**靜默略過**。
 3. `.ai/docs/agents/testing.md` — 本 repo 的測試情境，由 `setup-matt-preset` 與使用者討論後寫出。檔案不存在時**靜默略過**，一切照本 skill 與 references 的字面執行。存在時：
    - 本 skill 與 references 以「測試專案」表達的**受影響範圍**（逐 commit 驗證、收尾驗證、跨層刪併後重跑），一律改讀為它定義的執行單位與受影響範圍，指令照它寫的跑。
    - 「動到共用測試基礎設施時整個測試專案跑完」那條**不改讀**——那條要的就是全跑；它寫了全跑耗時或要求全跑前先問時，停下來問使用者，不自行全跑。

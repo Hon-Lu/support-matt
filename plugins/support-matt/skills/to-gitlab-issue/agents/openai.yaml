@@ -1,0 +1,5 @@
+interface:
+  display_name: "To GitLab Issue"
+  short_description: "把 issue-doc、ticket 與盤點發布到指定的 GitLab 主 Issue"
+policy:
+  allow_implicit_invocation: false

@@ -1,7 +1,7 @@
 # support-matt
 
-- 套件版本：`v0.32.2`
-- 更新時間：2026-11-04
+- 套件版本：`v0.33.0`
+- 更新時間：2026-11-05
 - 安裝教程：[INSTALL.md](./INSTALL.md)
 <!-- 版本對齊 plugins/support-matt/.claude-plugin/plugin.json 與 .codex-plugin/plugin.json，發版時三處版本與此處日期一併更新 -->
 
@@ -27,6 +27,7 @@
 | `implement-stepwise` | 取代 `implement`（**即時插手**）：單一 session 做完整張票，形狀貼近原生，但開場先評估規模、每個 commit 送出前停下附完整 commit message 與變更清單等你過目，回「繼續」才提交並接著做下一個；最後一個 commit 提交後直接跑驗證（測試 + 跨層重複檢查 + 逐條判定驗收條件），做完停在定稿前停點給你看結果；**不自動跑 `code-review`**，只在 ticket 有硬約束可對照、實作偏離計畫或動到高風險區域時於停點建議，你要求才執行；最後把本票的 commit 壓成一個票級 commit（條列只留描述最終 diff 的原 commit 標題），再把核對結果寫回 ticket。不預先產 commit checklist。 |
 | `to-acceptance-map` | branch 開發完畢後於**獨立 session** 盤點測試覆蓋，產出 `acceptance-map.md`。驗證基準只認規格文件的 `VC-xx`，不拿 ticket 充數。「覆蓋不足」須舉得出一個能通過現有測試卻違反 VC 的合理實作，不把條文逐字展開成必測組合；判定另區分「需補測試」與「不適用測試」，使用者決定不補的缺口記在規格文件、重跑時判為「已接受缺口」。另檢出可能已失效的測試與潛在重複覆蓋（只偵測、不動測試）。回報只呈現例外，全程唯讀。 |
 | `to-change-request` | 開發中途改動的**再入點**：grill 完接這一支，一次做完 `spec.md` delta、規格文件修訂（委派給該 feature 實際用的 `to-issue-doc` 或 `to-engineering-spec`）與未完成 ticket 的修訂，一個確認關卡；每份產物改或不改都附理由。需要新票時給出插入票號（如 `04a`）交給 `to-tickets`，已完成的票不動。純實作的改動直接請你去 implement，不動文件。 |
+| `to-gitlab-issue` | 收尾時把文件發布到**使用者指定 URL** 的主 Issue：`issue-doc.md` 替換主內文，ticket 與 `acceptance-map.md` 各留言一則。寫入前備份原內容、寫入後讀回比對。這是「GitLab 只讀」的明確例外，只能由使用者調用。 |
 
 掛載位置：
 
@@ -42,7 +43,7 @@ grill-with-docs → to-spec ─┬─ 設計後補　 → [to-issue-doc brief] �
                                                                           ↓
                                                               整條 branch 的 ticket 全部完成（以下開新 session）
                                                                           ↓
-        設計後補　：[to-issue-doc final]（補齊交付內容）→ [to-acceptance-map]
+        設計後補　：[to-issue-doc final]（補齊交付內容）→ [to-acceptance-map] → [to-gitlab-issue]（發布到主 Issue）
         設計先定版：[to-acceptance-map] → [to-engineering-spec 定稿]
 
 開發中途要改：grill-me / grill-with-docs → [to-change-request] → implement-stepwise

@@ -1,12 +1,22 @@
 ---
 name: to-gitlab-issue
-description: 整條 branch 收尾時，把本地文件發布到公司 GitLab 主 Issue：以 issue-doc.md（final）替換主內文，再留言兩則，一則是 issues/ 全部 ticket 的開發紀錄，一則是 acceptance-map.md。寫入前先備份 Issue 原內容到暫存目錄，寫入後讀回比對。使用者必須提供 Issue URL，沒給就問，不得從分支名、目錄名或 commit 推測編號。這是「GitLab 只讀」規則的明確例外，只在使用者調用本 skill 時成立。當使用者要把規格與盤點貼回 GitLab Issue、更新主 Issue 內文，或說「發布到 Issue」「貼上 Issue」「把文件送上 GitLab」時使用。
+description: 把本地文件發布到公司 GitLab 主 Issue，有什麼發什麼：issue-doc.md（final）替換主內文，issues/ 全部 ticket 留言一則開發紀錄，acceptance-map.md 留言一則，缺的部分跳過並回報。寫入前先備份 Issue 原內容到暫存目錄，寫入後讀回比對。使用者必須提供 Issue URL，沒給就問，不得從分支名、目錄名或 commit 推測編號。這是「GitLab 只讀」規則的明確例外，只在使用者調用本 skill 時成立。當使用者要把規格與盤點貼回 GitLab Issue、更新主 Issue 內文，或說「發布到 Issue」「貼上 Issue」「把文件送上 GitLab」時使用。
 disable-model-invocation: true
 ---
 
 # to-gitlab-issue
 
-把 `to-issue-doc` final 與 `to-acceptance-map` 的產物送上主 Issue。本地文件是來源，GitLab 是發布目的地；這支不改任何本地文件。
+把 feature 目錄裡的文件送上主 Issue。本地文件是來源，GitLab 是發布目的地；這支不改任何本地文件。
+
+工作流可以依案子抽掉步驟，所以三個部分都是**有才發布**：
+
+| 部分 | 來源 | 什麼時候跳過 |
+| --- | --- | --- |
+| 主內文 | `issue-doc.md` | 沒有這個檔，或文件狀態不是 final。例如 Issue 已有開發文件，主內文就維持原樣 |
+| 開發紀錄留言 | `issues/*.md` | 沒有 ticket |
+| 驗收盤點留言 | `acceptance-map.md` | 沒有這個檔 |
+
+使用者明確說這次不發某一部分時，帶 `--skip description`、`--skip tickets` 或 `--skip map`，可重複指定。跳過不是錯誤，但要在回報中講清楚，使用者才知道哪些沒有上去。
 
 ## 寫入權限（本 skill 的特例）
 
@@ -42,15 +52,17 @@ URL 只取使用者這次訊息給的那一個。
 python "SKILL_DIR/scripts/publish_issue.py" --url "<使用者給的 URL>" --feature-dir "<feature 目錄>" --base "<目標分支>"
 ```
 
-`--base` 是這條分支要合併進去的分支，用來算 commit 清單。使用者沒說就問，不要猜：猜錯會列出不屬於這條分支的 commit。
+`--base` 是這條分支要合併進去的分支，用來算 commit 清單，要發布開發紀錄時才需要。使用者沒說就問，不要猜：猜錯會列出不屬於這條分支的 commit。
+
+預演結果的 `skipped` 列出這次不會發布的部分與原因，先轉告使用者。如果跳過的正好是使用者想發的，例如 `issue-doc.md` 還不是 final，就停下來讓使用者決定，不要自行改檔或硬發。
 
 腳本不會寫入 GitLab，只會備份 Issue 現況到暫存目錄，組好內容，再印一行 JSON。`status` 是 `preview` 才繼續，其他值依下表處理。
 
 | `status` | 意思 | 怎麼處理 |
 | --- | --- | --- |
 | `bad_url` | URL 格式不對 | 請使用者給完整 URL |
-| `missing_files` | 缺 `issue-doc.md`、`acceptance-map.md` 或 ticket | 告知缺哪個並停止，不要自己補 |
-| `doc_not_final` | `issue-doc.md` 不是 final | 請使用者先跑 `to-issue-doc` final |
+| `nothing_to_publish` | 三個部分都沒有可發布的內容 | 轉告 `skipped` 的原因並停止，不要自己補文件 |
+| `base_required` | 要發布開發紀錄，但沒有 `--base` | 請使用者提供目標分支 |
 | `base_not_found` | 找不到 `--base`，或它和 HEAD 沒有共同祖先 | 請使用者確認目標分支 |
 | `no_commits` | HEAD 相對 `--base` 沒有 commit | 告知使用者並停止，可能在錯的分支 |
 | `too_large` | 內容超過 GitLab 上限 | 告知使用者，不要自行截斷 |
@@ -80,7 +92,7 @@ python "SKILL_DIR/scripts/publish_issue.py" --url "<使用者給的 URL>" --feat
 python "SKILL_DIR/scripts/publish_issue.py" --url "<URL>" --feature-dir "<feature 目錄>" --base "<目標分支>" --apply
 ```
 
-腳本依序更新主內文、開發紀錄、驗收盤點，再讀回比對。讀回時會忽略表格分隔線與行尾空白，因為 GitLab 會改寫它們。
+腳本依序更新主內文、開發紀錄、驗收盤點中要發布的部分，再讀回比對。讀回時會忽略表格分隔線與行尾空白，因為 GitLab 會改寫它們。
 
 - `status: ok`：完成。
 - `status: blocked`：有 blockers 尚未處理，什麼都沒有寫入。回到第 3 步。
@@ -92,7 +104,7 @@ python "SKILL_DIR/scripts/publish_issue.py" --url "<URL>" --feature-dir "<featur
 告知使用者：
 
 - Issue 連結與標題。
-- 三項各自的結果，以及兩則留言的 note id。
+- 每一部分的結果：已發布的附留言 note id，跳過的附原因。
 - 備份目錄的完整路徑。原內文在 `issue-before.json`，暫存目錄不會永久保留，要留存請使用者自行搬走。
 - 預演時使用者確認過的事項，例如覆蓋了差異很大的內文。
 
@@ -147,4 +159,4 @@ python "SKILL_DIR/scripts/publish_issue.py" --url "<URL>" --feature-dir "<featur
 [to-issue-doc final] → [to-acceptance-map] → [to-gitlab-issue] → 使用者自行 push、開 MR
 ```
 
-本 skill 排在最後，因為它發布的兩份文件都來自前兩步。之後文件有修訂，重新調用本 skill 並確認更新既有留言即可。
+這是完整流程的順序，前兩步都可以抽掉。之後文件有修訂，重新調用本 skill 並確認更新既有留言即可。

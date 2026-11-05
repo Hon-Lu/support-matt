@@ -1,11 +1,11 @@
 ---
 name: to-change-request
-description: 開發中途發現需要改動時的再入點：接在 grill 之後、implement 之前，一次做完需求與設計文件的同步並修訂受影響的未完成 ticket，取代手動依序調用 to-spec、to-engineering-spec。先分流本次改動屬於純實作、設計層級或需求層級，純實作直接請使用者去 implement 不動任何文件；需要動文件時對 spec.md 只做 delta 編輯（不重寫整份、不重新 publish），設計與驗證條件一律委派該 feature 的規格文件 skill（to-issue-doc 或 to-engineering-spec）修訂模式，每份產物不論改或不改都列出結果與理由，一起攤出來讓使用者確認，通過後就地修訂未完成的 ticket 並停止。需要新票時不自己開，改給出插入位置與字尾票號（例如 04a），輸出一行交給 to-tickets；已完成的票一律不動。本 skill 不寫程式、不跑 code-review、不做定稿、不建立或修改任何遠端 Issue。當使用者在 branch 開發到一半發現需求或設計要調整、剛 grill 完要把結論同步回文件與 ticket 時使用。
+description: 開發中途發現需要改動時的再入點：接在討論或 grill 之後、implement 之前，一次做完需求與設計文件的同步並修訂受影響的未完成 ticket，取代手動依序調用 to-spec、to-engineering-spec。先分流本次改動屬於純實作、設計層級或需求層級，純實作直接請使用者去 implement 不動任何文件；需要動文件時對 spec.md 只做 delta 編輯（不重寫整份、不重新 publish），設計與驗證條件一律委派該 feature 的規格文件 skill（to-issue-doc 或 to-engineering-spec）修訂模式，每份產物不論改或不改都列出結果與理由，一起攤出來讓使用者確認，通過後就地修訂未完成的 ticket 並停止。需要新票時不自己開，改給出插入位置與字尾票號（例如 04a），輸出一行交給 to-tickets；已完成的票一律不動。本 skill 不寫程式、不跑 code-review、不做定稿、不建立或修改任何遠端 Issue。當使用者在 branch 開發到一半發現需求或設計要調整、剛討論或 grill 完要把結論同步回文件與 ticket 時使用。
 ---
 
 # to-change-request
 
-開發中途改變主意時的**再入點**。接在 grill 之後、`implement` 之前，把 grill 的結論同步進 `spec.md` 與本 feature 的規格文件，並修訂受影響的未完成 ticket；需要新票時，給出票號交給 `to-tickets`。
+開發中途改變主意時的**再入點**。接在討論或 grill 之後、`implement` 之前，把結論同步進 `spec.md` 與本 feature 的規格文件，並修訂受影響的未完成 ticket；需要新票時，給出票號交給 `to-tickets`。
 
 > **規格文件指哪一份**：預設是 `issue-doc.md`，修訂委派給 `to-issue-doc`（修訂模式）；重案流程（動角色權限、schema、跨模組交易）是 `engineering-spec.md`，委派給 `to-engineering-spec`（修訂模式）。以哪一份實際存在於 feature 目錄為準，兩份都在時以 `engineering-spec.md` 為準。**本檔以下一律寫 `engineering-spec.md`，那些敘述對 `issue-doc.md` 同樣成立**——差別只有委派對象與狀態名稱（`定稿` 對應 `final`）。
 
@@ -13,7 +13,7 @@ description: 開發中途發現需要改動時的再入點：接在 grill 之後
 
 ```text
 （開發中途發現要改）
-  → grill-me / grill-with-docs（使用者自己跑，取得共識）
+  → 討論或 grill-me / grill-with-docs（取得共識）
   → [to-change-request]  ← 本 skill：分流 → 同步 spec → 同步 engineering-spec → 一個確認關卡 → 修訂未完成 ticket
   → （需要新票時）to-tickets，依本 skill 給的票號插入
   → implement-stepwise
@@ -43,11 +43,11 @@ description: 開發中途發現需要改動時的再入點：接在 grill 之後
 
 合法的入口有三種，處理方式相同：
 
-1. 剛跑完 `grill-me` 或 `grill-with-docs`，結論在當前對話裡。**兩者對本 skill 沒有差別**——差別在 grill 過程要不要查文件，產出到本 skill 手上時都是「對話裡的共識」。`grill-with-docs` 若順帶產生了 ADR，一併讀進來。
+1. 剛討論完，或剛跑完 `grill-me`、`grill-with-docs`，結論在當前對話裡。**這些對本 skill 沒有差別**——產出到本 skill 手上時都是「對話裡的共識」。`grill-with-docs` 若順帶產生了 ADR，一併讀進來。
 2. 使用者直接口述一項已經想清楚的改動。
 3. `code-review` 或測試過程中發現的問題，使用者已決定怎麼改。
 
-**共識不足時停下來。** 使用者只丟一句「這裡好像怪怪的」而沒有結論，不要自行決定改法後往下跑——回一句請他先 grill。本 skill 的每一步都假設「要改成什麼」已經定案。
+**共識不足時停下來。** 使用者只丟一句「這裡好像怪怪的」而沒有結論，不要自行決定改法後往下跑——回一句請他先討論出結論，或跑 grill。本 skill 的每一步都假設「要改成什麼」已經定案。
 
 ## 分流（第一步，也是最省事的一步）
 

@@ -226,7 +226,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", required=True, help="使用者提供的 Issue URL")
     parser.add_argument("--feature-dir", required=True)
-    parser.add_argument("--base", required=True, help="這條分支的目標分支，用來算 commit 清單")
+    parser.add_argument("--base", help="這條分支的目標分支，用來算 commit 清單；要發布開發紀錄時必填")
+    parser.add_argument("--skip", action="append", choices=["description", "tickets", "map"], default=[], help="這次不發布的部分，可重複指定")
     parser.add_argument("--apply", action="store_true", help="實際寫入 GitLab；沒帶時只預演")
     parser.add_argument("--on-existing", choices=["stop", "update"], default="stop", help="Issue 已有同類留言時的處理")
     parser.add_argument("--confirm-replace", action="store_true", help="使用者已確認可覆蓋差異很大的主內文")
@@ -243,25 +244,53 @@ def main():
         doc_path = os.path.join(args.feature_dir, "issue-doc.md")
         map_path = os.path.join(args.feature_dir, "acceptance-map.md")
         ticket_paths = sorted(glob.glob(os.path.join(glob.escape(args.feature_dir), "issues", "*.md")))
-        missing = [name for name, ok in (("issue-doc.md", os.path.isfile(doc_path)), ("acceptance-map.md", os.path.isfile(map_path)), ("issues/*.md", bool(ticket_paths))) if not ok]
-        if missing:
-            raise Stop("missing_files", missing=missing)
+        # 流程可以抽掉步驟，所以每一部分都是有才發布，跳過的原因要回報給使用者。
+        skipped = result["skipped"] = {name: "使用者指定跳過" for name in args.skip}
+        doc = map_doc = tickets_body = None
+        documents = []
 
-        doc, map_doc = read_doc(doc_path), read_doc(map_path)
-        ticket_docs = [read_doc(path) for path in ticket_paths]
-        if not re.search(r"^文件狀態:\s*final\b", doc, re.MULTILINE):
-            raise Stop("doc_not_final", message="issue-doc.md 的文件狀態不是 final")
+        if "description" not in skipped:
+            if not os.path.isfile(doc_path):
+                skipped["description"] = "沒有 issue-doc.md"
+            else:
+                candidate = read_doc(doc_path)
+                # brief 是開發中的計畫，不該蓋掉主內文。
+                if re.search(r"^文件狀態:\s*final\b", candidate, re.MULTILINE):
+                    doc = candidate
+                    documents.append(("issue-doc.md", doc))
+                else:
+                    skipped["description"] = "issue-doc.md 的文件狀態不是 final"
 
-        commits = read_commits(args.base)
-        branch = git_output("branch", "--show-current") or "HEAD"
-        tickets = [(os.path.splitext(os.path.basename(path))[0], ticket) for path, ticket in zip(ticket_paths, ticket_docs)]
-        tickets_body = build_tickets_body(tickets, branch, args.base, commits)
-        result["branch"] = branch
-        result["commits"] = len(commits)
-        unpushed = git_output("rev-list", "--count", "@{upstream}..HEAD")
-        result["unpushed_commits"] = int(unpushed) if unpushed else None
-        result["tickets"] = [os.path.basename(path) for path in ticket_paths]
-        result["chars"] = {"description": len(doc), "tickets": len(tickets_body), "map": len(map_doc)}
+        if "map" not in skipped:
+            if os.path.isfile(map_path):
+                map_doc = read_doc(map_path)
+                documents.append(("acceptance-map.md", map_doc))
+            else:
+                skipped["map"] = "沒有 acceptance-map.md"
+
+        if "tickets" not in skipped:
+            if ticket_paths:
+                if not args.base:
+                    raise Stop("base_required", message="要發布開發紀錄時，需要 --base 指定目標分支")
+                ticket_docs = [read_doc(path) for path in ticket_paths]
+                documents.extend((os.path.basename(p), d) for p, d in zip(ticket_paths, ticket_docs))
+                commits = read_commits(args.base)
+                branch = git_output("branch", "--show-current") or "HEAD"
+                tickets = [(os.path.splitext(os.path.basename(path))[0], ticket) for path, ticket in zip(ticket_paths, ticket_docs)]
+                tickets_body = build_tickets_body(tickets, branch, args.base, commits)
+                result["branch"] = branch
+                result["commits"] = len(commits)
+                unpushed = git_output("rev-list", "--count", "@{upstream}..HEAD")
+                result["unpushed_commits"] = int(unpushed) if unpushed else None
+                result["tickets"] = [os.path.basename(path) for path in ticket_paths]
+            else:
+                skipped["tickets"] = "沒有 issues/*.md"
+
+        contents = {"description": doc, "tickets": tickets_body, "map": map_doc}
+        if not any(contents.values()):
+            raise Stop("nothing_to_publish", message="沒有可發布的內容")
+
+        result["chars"] = {name: len(body) for name, body in contents.items() if body}
         if max(result["chars"].values()) > MAX_BODY_CHARS:
             raise Stop("too_large", message=f"單一內容超過 GitLab 上限 {MAX_BODY_CHARS} 字元", **{"chars": result["chars"]})
 
@@ -275,7 +304,6 @@ def main():
         if remote_state != "match" and not args.confirm_mismatch:
             blockers.append("remote_mismatch")
 
-        documents = [("issue-doc.md", doc), ("acceptance-map.md", map_doc)] + [(os.path.basename(p), d) for p, d in zip(ticket_paths, ticket_docs)]
         secret_hits = scan_secrets(documents)
         result["secret_hits"] = secret_hits
         if secret_hits and not args.confirm_secrets:
@@ -293,18 +321,20 @@ def main():
             json.dump(issue, handle, ensure_ascii=False, indent=1)
         with open(os.path.join(work_dir, "notes-before.json"), "w", encoding="utf-8") as handle:
             json.dump(notes, handle, ensure_ascii=False, indent=1)
-        for name, body in (("issue-doc", doc), ("tickets", tickets_body), ("map", map_doc)):
-            with open(os.path.join(work_dir, f"{name}.md"), "w", encoding="utf-8", newline="\n") as handle:
-                handle.write(body)
+        for name, body in contents.items():
+            if body:
+                with open(os.path.join(work_dir, f"{name}.md"), "w", encoding="utf-8", newline="\n") as handle:
+                    handle.write(body)
 
         result["issue"] = {"title": issue.get("title"), "state": issue.get("state"), "url": issue.get("web_url")}
-        kind, ratio = describe_existing(issue.get("description"), doc)
-        result["existing_description"] = {"kind": kind, "similarity": ratio, "chars": len(issue.get("description") or ""), "author": (issue.get("author") or {}).get("username")}
-        if kind == "different" and not args.confirm_replace:
-            blockers.append("description_differs")
+        if doc:
+            kind, ratio = describe_existing(issue.get("description"), doc)
+            result["existing_description"] = {"kind": kind, "similarity": ratio, "chars": len(issue.get("description") or ""), "author": (issue.get("author") or {}).get("username")}
+            if kind == "different" and not args.confirm_replace:
+                blockers.append("description_differs")
 
-        ticket_note = find_note(notes, lambda line: line == TICKETS_HEADING)
-        map_note = find_note(notes, lambda line: line.startswith(MAP_HEADING_PREFIX))
+        ticket_note = find_note(notes, lambda line: line == TICKETS_HEADING) if tickets_body else None
+        map_note = find_note(notes, lambda line: line.startswith(MAP_HEADING_PREFIX)) if map_doc else None
         result["existing_notes"] = {"tickets": ticket_note and ticket_note["id"], "map": map_note and map_note["id"]}
         if (ticket_note or map_note) and args.on_existing == "stop":
             blockers.append("notes_exist")
@@ -318,25 +348,22 @@ def main():
             return finish(result, 1)
 
         done = result["written"] = []
-        gitlab.update_description(doc)
-        done.append("description")
-        if ticket_note:
-            ticket_id = gitlab.update_note(ticket_note["id"], tickets_body, "tickets")["id"]
-        else:
-            ticket_id = gitlab.add_note(tickets_body, "tickets")["id"]
-        done.append(f"tickets:{ticket_id}")
-        if map_note:
-            map_id = gitlab.update_note(map_note["id"], map_doc, "map")["id"]
-        else:
-            map_id = gitlab.add_note(map_doc, "map")["id"]
-        done.append(f"map:{map_id}")
+        note_ids = {}
+        if doc:
+            gitlab.update_description(doc)
+            done.append("description")
+        for name, body, existing in (("tickets", tickets_body, ticket_note), ("map", map_doc, map_note)):
+            if body:
+                sent = gitlab.update_note(existing["id"], body, name) if existing else gitlab.add_note(body, name)
+                note_ids[name] = sent["id"]
+                done.append(f"{name}:{sent['id']}")
 
         after_issue, after_notes = gitlab.get_issue(), {n["id"]: n for n in gitlab.get_notes()}
-        verify = {
-            "description": normalize(after_issue.get("description")) == normalize(doc),
-            "tickets": normalize((after_notes.get(ticket_id) or {}).get("body")) == normalize(tickets_body),
-            "map": normalize((after_notes.get(map_id) or {}).get("body")) == normalize(map_doc),
-        }
+        verify = {}
+        if doc:
+            verify["description"] = normalize(after_issue.get("description")) == normalize(doc)
+        for name, note_id in note_ids.items():
+            verify[name] = normalize((after_notes.get(note_id) or {}).get("body")) == normalize(contents[name])
         result["verify"] = verify
         result["status"] = "ok" if all(verify.values()) else "verify_failed"
         return finish(result, 0 if all(verify.values()) else 1)

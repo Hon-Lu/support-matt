@@ -1,5 +1,0 @@
-interface:
-  display_name: "To Issue Doc"
-  short_description: "主 issue 文件：開場薄一頁，branch 收尾補成完稿"
-policy:
-  allow_implicit_invocation: false

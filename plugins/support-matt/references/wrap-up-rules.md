@@ -127,7 +127,7 @@ commit 前的 consolidation 有個看不到的死角：**同一個行為的單�
 - **指令寫成可直接複製執行的一整行**，並寫出命中哪幾條與具體依據。
 - **skill 寫完整名稱 `/mattpocock-skills:code-review`。** 環境裡常有其他同名的 `code-review`（例如 Claude Code 內建的），只寫短名，執行端（包括轉交給其他 agent 時）分不出要叫哪一個。
 - **fixed point 用本票第一個 commit 的 parent SHA**，審查範圍才會只限本票；沒給的話 `/code-review` 會反問，隨手回 `main` 就變成審整條 branch。
-- **規格來源直接帶本票 ticket 的路徑。** 不帶的話 `/code-review` 會自己找規格，在 local markdown tracker 下很容易抓到整份 `spec.md` 或 `issue-doc.md`，把別張票的需求報成缺漏。
+- **規格來源直接帶本票 ticket 的路徑。** 不帶的話 `/code-review` 會自己找規格，在 local markdown tracker 下很容易抓到整份 `spec.md` 或 `feature-doc.md`，把別張票的需求報成缺漏。
 - **一條都沒命中就整段不提**，不要寫「本票不需審查」。
 - 判斷只看上面的事實成不成立，**不評實作對錯**——那正是要交給冷眼的部分。
 

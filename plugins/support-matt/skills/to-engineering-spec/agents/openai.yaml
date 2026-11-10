@@ -1,5 +1,0 @@
-interface:
-  display_name: "To Engineering Spec"
-  short_description: "Matt to-spec 與 to-tickets 之間的正式開發規格層"
-policy:
-  allow_implicit_invocation: true

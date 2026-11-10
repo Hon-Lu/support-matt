@@ -20,6 +20,8 @@ import urllib.parse
 MAX_BODY_CHARS = 1_000_000
 TICKETS_HEADING = "# 開發紀錄（TICKETS）"
 MAP_HEADING_PREFIX = "# 驗收盤點"
+# brief 與 draft 還在變動，不該蓋掉主內文，所以只發布各自的完成狀態。
+DESCRIPTION_SOURCES = (("feature-doc.md", "final"), ("handoff-doc.md", "ready"))
 URL_PATTERN = re.compile(r"^https?://([^/]+)/(.+?)/-/(?:issues|work_items)/(\d+)/?(?:[?#].*)?$")
 
 # 只比對「看起來真的帶值」的寫法，避免把「帳號沒有密碼」這類敘述當成秘密。
@@ -42,6 +44,20 @@ class Stop(Exception):
 def read_doc(path):
     with open(path, encoding="utf-8-sig", newline="") as handle:
         return handle.read().replace("\r\n", "\n").strip() + "\n"
+
+
+def read_description(feature_dir):
+    """回傳 (檔名, 內文, 跳過原因)。"""
+    found = [source for source in DESCRIPTION_SOURCES if os.path.isfile(os.path.join(feature_dir, source[0]))]
+    if not found:
+        return None, None, "沒有 " + " 或 ".join(name for name, _ in DESCRIPTION_SOURCES)
+    if len(found) > 1:
+        raise Stop("ambiguous_description", message="feature 目錄同時有 " + " 與 ".join(name for name, _ in found) + "，無法判斷要發布哪一份")
+    name, status = found[0]
+    candidate = read_doc(os.path.join(feature_dir, name))
+    if re.search(rf"^文件狀態:\s*{status}\b", candidate, re.MULTILINE):
+        return name, candidate, None
+    return None, None, f"{name} 的文件狀態不是 {status}"
 
 
 def normalize(text):
@@ -241,7 +257,6 @@ def main():
         host, project, iid = parse_url(args.url)
         result.update(project=project, iid=iid)
 
-        doc_path = os.path.join(args.feature_dir, "issue-doc.md")
         map_path = os.path.join(args.feature_dir, "acceptance-map.md")
         ticket_paths = sorted(glob.glob(os.path.join(glob.escape(args.feature_dir), "issues", "*.md")))
         # 流程可以抽掉步驟，所以每一部分都是有才發布，跳過的原因要回報給使用者。
@@ -250,16 +265,11 @@ def main():
         documents = []
 
         if "description" not in skipped:
-            if not os.path.isfile(doc_path):
-                skipped["description"] = "沒有 issue-doc.md"
+            doc_name, doc, skip_reason = read_description(args.feature_dir)
+            if doc:
+                documents.append((doc_name, doc))
             else:
-                candidate = read_doc(doc_path)
-                # brief 是開發中的計畫，不該蓋掉主內文。
-                if re.search(r"^文件狀態:\s*final\b", candidate, re.MULTILINE):
-                    doc = candidate
-                    documents.append(("issue-doc.md", doc))
-                else:
-                    skipped["description"] = "issue-doc.md 的文件狀態不是 final"
+                skipped["description"] = skip_reason
 
         if "map" not in skipped:
             if os.path.isfile(map_path):

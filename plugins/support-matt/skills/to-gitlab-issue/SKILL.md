@@ -1,6 +1,6 @@
 ---
 name: to-gitlab-issue
-description: 把本地文件發布到公司 GitLab 主 Issue，有什麼發什麼：issue-doc.md（final）替換主內文，issues/ 全部 ticket 留言一則開發紀錄，acceptance-map.md 留言一則，缺的部分跳過並回報。寫入前先備份 Issue 原內容到暫存目錄，寫入後讀回比對。使用者必須提供 Issue URL，沒給就問，不得從分支名、目錄名或 commit 推測編號。這是「GitLab 只讀」規則的明確例外，只在使用者調用本 skill 時成立。當使用者要把規格與盤點貼回 GitLab Issue、更新主 Issue 內文，或說「發布到 Issue」「貼上 Issue」「把文件送上 GitLab」時使用。
+description: 把本地文件發布到公司 GitLab 主 Issue，有什麼發什麼：feature-doc.md（final）或 handoff-doc.md（ready）替換主內文，issues/ 全部 ticket 留言一則開發紀錄，acceptance-map.md 留言一則，缺的部分跳過並回報。寫入前先備份 Issue 原內容到暫存目錄，寫入後讀回比對。使用者必須提供 Issue URL，沒給就問，不得從分支名、目錄名或 commit 推測編號。這是「GitLab 只讀」規則的明確例外，只在使用者調用本 skill 時成立。當使用者要把規格與盤點貼回 GitLab Issue、更新主 Issue 內文，或說「發布到 Issue」「貼上 Issue」「把文件送上 GitLab」時使用。
 disable-model-invocation: true
 ---
 
@@ -12,7 +12,7 @@ disable-model-invocation: true
 
 | 部分 | 來源 | 什麼時候跳過 |
 | --- | --- | --- |
-| 主內文 | `issue-doc.md` | 沒有這個檔，或文件狀態不是 final。例如 Issue 已有開發文件，主內文就維持原樣 |
+| 主內文 | `feature-doc.md`（final）或 `handoff-doc.md`（ready） | 兩個檔都沒有，或文件狀態不符。例如 Issue 已有開發文件，主內文就維持原樣 |
 | 開發紀錄留言 | `issues/*.md` | 沒有 ticket |
 | 驗收盤點留言 | `acceptance-map.md` | 沒有這個檔 |
 
@@ -54,7 +54,7 @@ python "SKILL_DIR/scripts/publish_issue.py" --url "<使用者給的 URL>" --feat
 
 `--base` 是這條分支要合併進去的分支，用來算 commit 清單，要發布開發紀錄時才需要。使用者沒說就問，不要猜：猜錯會列出不屬於這條分支的 commit。
 
-預演結果的 `skipped` 列出這次不會發布的部分與原因，先轉告使用者。如果跳過的正好是使用者想發的，例如 `issue-doc.md` 還不是 final，就停下來讓使用者決定，不要自行改檔或硬發。
+預演結果的 `skipped` 列出這次不會發布的部分與原因，先轉告使用者。如果跳過的正好是使用者想發的，例如 `feature-doc.md` 還不是 final、`handoff-doc.md` 還不是 ready，就停下來讓使用者決定，不要自行改檔或硬發。
 
 腳本不會寫入 GitLab，只會備份 Issue 現況到暫存目錄，組好內容，再印一行 JSON。`status` 是 `preview` 才繼續，其他值依下表處理。
 
@@ -62,6 +62,7 @@ python "SKILL_DIR/scripts/publish_issue.py" --url "<使用者給的 URL>" --feat
 | --- | --- | --- |
 | `bad_url` | URL 格式不對 | 請使用者給完整 URL |
 | `nothing_to_publish` | 三個部分都沒有可發布的內容 | 轉告 `skipped` 的原因並停止，不要自己補文件 |
+| `ambiguous_description` | feature 目錄同時有 `feature-doc.md` 與 `handoff-doc.md` | 轉告使用者，由使用者決定留哪一份，或帶 `--skip description` |
 | `base_required` | 要發布開發紀錄，但沒有 `--base` | 請使用者提供目標分支 |
 | `base_not_found` | 找不到 `--base`，或它和 HEAD 沒有共同祖先 | 請使用者確認目標分支 |
 | `no_commits` | HEAD 相對 `--base` 沒有 commit | 告知使用者並停止，可能在錯的分支 |
@@ -76,7 +77,7 @@ python "SKILL_DIR/scripts/publish_issue.py" --url "<使用者給的 URL>" --feat
 | --- | --- | --- |
 | `issue_number_mismatch` | 目錄名的編號和 URL 不同，可能貼錯 Issue | 使用者確認後 `--confirm-mismatch` |
 | `remote_mismatch` | 目前 repo 的 `origin` 和 URL 的專案不同，或查不到 | 使用者確認後 `--confirm-mismatch` |
-| `description_differs` | 現有主內文和 `issue-doc.md` 差異很大，可能是別人寫的需求 | 給使用者看 `issue-before.json` 的內文摘要與作者，確認後 `--confirm-replace` |
+| `description_differs` | 現有主內文和要發布的文件差異很大，可能是別人寫的需求 | 給使用者看 `issue-before.json` 的內文摘要與作者，確認後 `--confirm-replace` |
 | `notes_exist` | Issue 已有同類留言，可能是重跑 | 使用者同意更新後 `--on-existing update`，會就地改那兩則，不會多留一份 |
 | `secret_hits` | 秘密掃描命中，結果只列檔案與行號 | 自己去看該行，**不要把值貼進對話**。真的是秘密就停下來請使用者清除；確認誤判後 `--confirm-secrets` |
 
@@ -145,18 +146,19 @@ python "SKILL_DIR/scripts/publish_issue.py" --url "<URL>" --feature-dir "<featur
 </details>
 ```
 
-驗收盤點就是 `acceptance-map.md` 的全文。主內文就是 `issue-doc.md` 的全文。三者都會去掉 BOM 並把 CRLF 轉成 LF，本地檔案不受影響。
+驗收盤點就是 `acceptance-map.md` 的全文。主內文就是 `feature-doc.md` 或 `handoff-doc.md` 的全文。三者都會去掉 BOM 並把 CRLF 轉成 LF，本地檔案不受影響。
 
 腳本用留言的第一行認出既有留言：`# 開發紀錄（TICKETS）` 與開頭為 `# 驗收盤點` 的留言。不要手動改這兩行，否則重跑時會認不出來而多留一份。
 
 ## 適用範圍
 
-只處理走 `to-issue-doc` 的 feature。重案流程的 `engineering-spec.md` 要先轉成交付版，檔名與貼法不同，目前不支援，遇到時告知使用者並停止。
+處理走 `to-feature-doc` 或 `to-handoff-doc` 的 feature。
 
 ## 工作流位置
 
 ```text
-[to-issue-doc final] → [to-acceptance-map] → [to-gitlab-issue] → 使用者自行 push、開 MR
+自己開發：[to-feature-doc final] → [to-acceptance-map] → [to-gitlab-issue] → 使用者自行 push、開 MR
+別人實作：[to-handoff-doc] → [to-gitlab-issue] → 實作者開工
 ```
 
-這是完整流程的順序，前兩步都可以抽掉。之後文件有修訂，重新調用本 skill 並確認更新既有留言即可。
+自己開發的流程前兩步都可以抽掉。別人實作時沒有 ticket 與盤點，只會發布主內文。之後文件有修訂，重新調用本 skill 並確認更新既有留言即可。

@@ -1,0 +1,5 @@
+interface:
+  display_name: "To Handoff Doc"
+  short_description: "交給別人實作的主 Issue 文件：動工前一次寫到能開工"
+policy:
+  allow_implicit_invocation: false

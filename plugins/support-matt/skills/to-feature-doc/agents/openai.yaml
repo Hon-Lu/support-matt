@@ -1,0 +1,5 @@
+interface:
+  display_name: "To Feature Doc"
+  short_description: "自己開發時的主 Issue 文件：開場薄一頁，branch 收尾補成完稿"
+policy:
+  allow_implicit_invocation: false

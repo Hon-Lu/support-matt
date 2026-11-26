@@ -1,6 +1,6 @@
 # 測試規範
 
-`implement-stepwise` 使用；`to-acceptance-map` 引用其中的測試層級與 branch 層 cleanup。
+`implement-stepwise` 與 `implement-parallel` 的票級 agent 使用；`to-acceptance-map` 引用其中的測試層級與 branch 層 cleanup。
 
 ## 測試層級
 

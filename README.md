@@ -1,6 +1,6 @@
 # support-matt
 
-- 套件版本：`v0.38.1`
+- 套件版本：`v0.39.0`
 - 更新時間：2026-11-26
 - 安裝教程：[INSTALL.md](./INSTALL.md)
 <!-- 版本對齊 plugins/support-matt/.claude-plugin/plugin.json 與 .codex-plugin/plugin.json，發版時三處版本與此處日期一併更新 -->
@@ -24,6 +24,7 @@
 | `to-feature-doc` | **自己開發時**產出貼上主 Issue 的 `feature-doc.md`，分雙模式：<br>• `brief`：拆票前跑，只寫約束（範圍、關鍵決策、驗證條件 `VC-xx`）。<br>• `final`：branch 做完跑，由既成事實組裝成以功能為主軸的文件。 |
 | `to-handoff-doc` | **交給不使用 Matt 的人實作時**，在動工前一次寫出能開工的 `handoff-doc.md`，貼上主 Issue。章節骨架與 `final` 相同，另標明必須遵守的設計決策與可調整的實作方向。 |
 | `implement-stepwise` | 取代 `implement`：單一 session 做完整張票，每個 commit 送出前停下等你過目，收尾驗證後停在定稿前，最後壓成一個票級 commit 並寫回 ticket。**不自動跑 Matt 的雙審 skill（`code-review`）**。 |
+| `implement-parallel` | 取代 `implement-spec`：經 **Herdr** 並行實作同一份 spec 的多張票。每張票在獨立 worktree 由票級 agent 實作，你逐票確認後才 squash 成整合分支上的一個 commit，全票合入後固定跑一次 Matt 雙審。開場指定票級 agent 與雙審 agent 各用 Claude 或 Codex。 |
 | `to-acceptance-map` | branch 開發完畢後於**獨立 session** 盤點測試覆蓋，產出 `acceptance-map.md`。驗證基準只認規格文件的 `VC-xx`，全程唯讀。 |
 | `to-change-request` | 開發中途改動的**再入點**：討論或 grill 完接這一支，一次做完 `spec.md` delta、規格文件與未完成 ticket 的修訂。 |
 | `to-gitlab-issue` | 把文件發布到**使用者指定 URL** 的主 Issue：`feature-doc.md` 或 `handoff-doc.md` 替換主內文，ticket 與 `acceptance-map.md` 各留言一則，缺的部分跳過。這是「GitLab 只讀」的明確例外，只能由使用者調用。 |
@@ -31,6 +32,8 @@
 > `to-feature-doc` 與 `to-handoff-doc` 的選擇只看由誰實作，與改動大小無關。
 
 > 不需要逐 commit 過目時，改用 Matt 原生的 `implement`。
+
+> 多張票可以同時開工、又在 Herdr 環境中時，可用 `implement-parallel` 取代逐張的 `implement-stepwise`，其餘流程不變。
 
 ## 工作流
 
@@ -88,7 +91,7 @@ flowchart LR
 
 ## 實作規範
 
-由四份 reference 提供（`plugins/support-matt/references/`），`implement-stepwise` 依階段各讀一次：
+由四份 reference 提供（`plugins/support-matt/references/`），`implement-stepwise` 與 `implement-parallel` 的票級 agent 依階段各讀一次：
 
 | Reference | 內容 |
 | --- | --- |

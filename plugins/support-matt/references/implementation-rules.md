@@ -1,6 +1,6 @@
 # 實作規範
 
-`implement-stepwise` 使用。
+`implement-stepwise` 與 `implement-parallel` 的票級 agent 使用。
 
 ## TDD
 

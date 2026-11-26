@@ -1,6 +1,6 @@
 # 收尾規範
 
-`implement-stepwise` 使用。
+`implement-stepwise` 使用；`implement-parallel` 的票級 agent 引用其中的「驗證」「跨層重複檢查」「驗收條件的判定規則」，以及票級 commit 與寫回 ticket 的格式。
 
 ## 收尾
 

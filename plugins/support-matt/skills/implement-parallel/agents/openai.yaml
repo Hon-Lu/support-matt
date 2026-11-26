@@ -1,0 +1,5 @@
+interface:
+  display_name: "Implement Parallel"
+  short_description: "經 Herdr 並行實作同一份 spec 的多張票，逐票確認後併入整合分支"
+policy:
+  allow_implicit_invocation: false
